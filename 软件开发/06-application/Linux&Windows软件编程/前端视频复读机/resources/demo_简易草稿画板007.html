@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>矢量画板 多选移动/缩放/旋转</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui; }
+        body { overflow: hidden; background: #f5f5f5; display: flex; flex-direction: column; height: 100vh; }
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: #222;
+            color: #fff;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .tool-group { display: flex; gap: 6px; align-items: center; padding: 0 8px; border-right: 1px solid #555; }
+        .tool-group:last-child { border-right: none; }
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #444;
+            color: white;
+        }
+        button.active { background: #2196F3; }
+        input[type="color"] { width: 36px; height: 32px; cursor: pointer; border: none; }
+        input[type="number"] { width: 60px; padding: 4px; }
+        label { font-size: 13px; margin-right: 4px; }
+        input[type="file"] { display: none; }
+        #canvasWrap { flex: 1; position: relative; }
+        #drawCanvas {
+            display: block;
+            background: #ffffff;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="tool-group">
+            <button data-tool="pen" class="active">画笔</button>
+            <button data-tool="line">直线</button>
+            <button data-tool="rect">矩形</button>
+            <button data-tool="circle">正圆</button>
+            <button data-tool="ellipse">椭圆</button>
+            <button data-tool="text">文字</button>
+            <button data-tool="image">插入图片</button>
+        </div>
+        <div class="tool-group">
+            <label>颜色:</label>
+            <input type="color" id="strokeColor" value="#000000">
+            <label>线宽:</label>
+            <input type="number" id="lineWidth" min="1" max="50" value="3">
+        </div>
+        <div class="tool-group">
+            <button id="undoBtn">撤销(Ctrl+Z)</button>
+            <button id="redoBtn">重做(Ctrl+U)</button>
+            <button id="clearBtn">清空画布</button>
+            <button id="resetViewBtn">重置视图</button>
+        </div>
+        <div class="tool-group">
+            <input type="file" id="fileInput" accept=".excalidraw,json"/>
+            <input type="file" id="imgUpload" accept="image/*"/>
+            <button id="openFileBtn">打开.excalidraw</button>
+            <button id="uploadImgBtn">上传图片</button>
+            <button id="saveExcalBtn">保存.excalidraw(选中/全部)</button>
+            <button id="exportSvgBtn">导出SVG(选中/全部)</button>
+        </div>
+    </div>
+    <div id="canvasWrap">
+        <canvas id="drawCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWrap = document.getElementById('canvasWrap');
+        const imgUpload = document.getElementById('imgUpload');
+
+        // 绘图基础状态
+        let currentTool = 'pen';
+        let strokeColor = '#000000';
+        let lineWidth = 3;
+        let isDrawing = false;
+        let startX = 0, startY = 0;
+        let currentX = 0, currentY = 0;
+        let tempShape = null;
+        let shapeHistory = [];
+        let redoStack = [];
+        const fileCache = new Map();
+        let fileIdSeq = 1;
+
+        // 选择系统
+        let selectedIndexSet = new Set();
+        let isBoxSelect = false;
+        let boxSelectStart = { x: 0, y: 0 };
+        let boxSelectEnd = { x: 0, y: 0 };
+
+        // 变换操作状态
+        const TRANS_TYPE = { NONE: 0, MOVE: 1, SCALE: 2, ROTATE: 3 };
+        let transformMode = TRANS_TYPE.NONE;
+        let transformStartWorld = { x: 0, y: 0 };
+        let transformOrigin = { x: 0, y: 0 };
+        let transformStartScale = 1;
+        let transformStartAngle = 0;
+        // 选中群组缓存
+        let groupBounds = null;
+        const handleRadius = 8;
+
+        // 视图缩放
+        let viewScale = 1;
+        let viewOffsetX = 0;
+        let viewOffsetY = 0;
+        const scaleStep = 0.05;
+        const minScale = 0.01;
+        const maxScale = 20;
+
+        // 工具切换
+        document.querySelectorAll('[data-tool]').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+            };
+        });
+        document.getElementById('strokeColor').oninput = e => strokeColor = e.target.value;
+        document.getElementById('lineWidth').oninput = e => lineWidth = Number(e.target.value);
+        document.getElementById('undoBtn').onclick = doUndo;
+        document.getElementById('redoBtn').onclick = doRedo;
+
+        document.getElementById('clearBtn').onclick = () => {
+            shapeHistory = [];
+            redoStack = [];
+            selectedIndexSet.clear();
+            groupBounds = null;
+            transformMode = TRANS_TYPE.NONE;
+            fileCache.clear();
+            renderAll();
+        };
+        document.getElementById('resetViewBtn').onclick = () => {
+            viewScale = 1;
+            viewOffsetX = 0;
+            viewOffsetY = 0;
+            renderAll();
+        };
+        document.getElementById('uploadImgBtn').onclick = () => imgUpload.click();
+
+        // 快捷键
+        window.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault(); doUndo();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
+                e.preventDefault(); doRedo();
+            }
+        });
+
+        function doUndo() {
+            if (!shapeHistory.length) return;
+            redoStack.push(shapeHistory.pop());
+            selectedIndexSet.clear();
+            groupBounds = null;
+            transformMode = TRANS_TYPE.NONE;
+            renderAll();
+        }
+        function doRedo() {
+            if (!redoStack.length) return;
+            shapeHistory.push(redoStack.pop());
+            selectedIndexSet.clear();
+            groupBounds = null;
+            transformMode = TRANS_TYPE.NONE;
+            renderAll();
+        }
+        function pushShapeRecord(shape) {
+            shapeHistory.push(shape);
+            redoStack = [];
+            selectedIndexSet.clear();
+            groupBounds = null;
+            transformMode = TRANS_TYPE.NONE;
+        }
+
+        // 图片加载
+        window.addEventListener('paste', async e => {
+            for (const item of e.clipboardData.items) {
+                if (!item.type.startsWith('image/')) continue;
+                await loadImageBlob(item.getAsFile()); break;
+            }
+        });
+        imgUpload.onchange = async e => {
+            const f = e.target.files[0];
+            if (!f) return; await loadImageBlob(f); imgUpload.value = '';
+        };
+        async function loadImageBlob(blob) {
+            const fileId = `file_${fileIdSeq++}`;
+            const base64 = await blobToBase64(blob);
+            fileCache.set(fileId, base64);
+            const img = new Image();
+            img.src = base64;
+            await new Promise(r => img.onload = r);
+            const cx = (canvasWrap.clientWidth - viewOffsetX) / viewScale;
+            const cy = (canvasWrap.clientHeight - viewOffsetY) / viewScale;
+            pushShapeRecord({
+                type: 'image', fileId, base64,
+                x: cx - img.width / 2, y: cy - img.height / 2,
+                width: img.width, height: img.height,
+                rot: 0, scale: 1
+            });
+            renderAll();
+        }
+        function blobToBase64(blob) {
+            return new Promise(r => { const fr = new FileReader(); fr.onload = e => r(e.target.result); fr.readAsDataURL(blob); });
+        }
+
+        // 文件导入导出
+        const fileInput = document.getElementById('fileInput');
+        document.getElementById('openFileBtn').onclick = () => fileInput.click();
+        fileInput.onchange = async e => {
+            const f = e.target.files[0]; if (!f) return;
+            const raw = JSON.parse(await f.text());
+            if (!raw.elements) return alert("非excalidraw文件");
+            if (raw.files) Object.entries(raw.files).forEach(([k, d]) => fileCache.set(k, d.dataURL));
+            shapeHistory = convertExcalToLocal(raw.elements);
+            redoStack = []; selectedIndexSet.clear(); groupBounds = null; transformMode = TRANS_TYPE.NONE;
+            renderAll(); alert("加载完成");
+            fileInput.value = '';
+        };
+        function getExportShapes() {
+            if (!selectedIndexSet.size) return [...shapeHistory];
+            return [...selectedIndexSet].map(i => shapeHistory[i]);
+        }
+        document.getElementById('saveExcalBtn').onclick = () => {
+            const exp = getExportShapes();
+            const files = {};
+            fileCache.forEach((d, k) => files[k] = { dataURL: d, mimeType: d.split(',')[0].split(':')[1].split(';')[0] });
+            const data = { type: "excalidraw", version: 2, source: "https://excalidraw.com", elements: convertLocalToExcal(exp), appState: { viewBackgroundColor: "#fff" }, files };
+            downloadFile(JSON.stringify(data, null, 2), "drawing.excalidraw", "application/json");
+        };
+        document.getElementById('exportSvgBtn').onclick = () => downloadFile(generateSVG(getExportShapes()), "drawing.svg", "image/svg+xml");
+        function downloadFile(*******) {
+            const url = URL.createObjectURL(new Blob([c], { type: m }));
+            const a = document.createElement("a"); a.href = url; a.download = n; a.click(); URL.revokeObjectURL(url);
+        }
+
+        // 格式互转
+        function convertLocalToExcal(shapes) {
+            return shapes.map((s, idx) => {
+                const base = { id: `elem_${Date.now()}_${idx}`, strokeColor: s.color || "#000", strokeWidth: s.width || 1, fillStyle: "none", strokeStyle: "solid", opacity: 100, version: 1, versionNonce: Math.random(), seed: Math.floor(Math.random() * 999999), groupIds: [], boundElements: null, updated: Date.now(), link: null, locked: false };
+                switch (s.type) {
+                    case "pen": return { ...base, type: "freedraw", x: 0, y: 0, width: 0, height: 0, points: s.points.map(p => [p.x, p.y]) };
+                    case "line": return { ...base, type: "line", x: Math.min(s.x1, s.x2), y: Math.min(s.y1, s.y2), width: Math.abs(s.x2 - s.x1), height: Math.abs(s.y2 - s.y1), points: [[s.x1, s.y1], [s.x2, s.y2]] };
+                    case "rect": const rx = Math.min(s.x1, s.x2), ry = Math.min(s.y1, s.y2), rw = Math.abs(s.x2 - s.x1), rh = Math.abs(s.y2 - s.y1); return { ...base, type: "rectangle", x: rx, y: ry, width: rw, height: rh };
+                    case "circle": const cr = Math.hypot(s.x2 - s.x1, s.y2 - s.y1); return { ...base, type: "ellipse", x: s.x1 - cr, y: s.y1 - cr, width: cr * 2, height: cr * 2 };
+                    case "ellipse": const erx = Math.abs(s.x2 - s.x1), ery = Math.abs(s.y2 - s.y1); return { ...base, type: "ellipse", x: s.x1 - erx, y: s.y1 - ery, width: erx * 2, height: ery * 2 };
+                    case "text": return { ...base, type: "text", x: s.x, y: s.y, fontSize: s.size, fontFamily: 1, text: s.content, textAlign: "left", verticalAlign: "top" };
+                    case "image": return { ...base, type: "image", fileId: s.fileId, x: s.x, y: s.y, width: s.width, height: s.height };
+                }
+            });
+        }
+        function convertExcalToLocal(els) {
+            const res = [];
+            els.forEach(el => {
+                const s = { color: el.strokeColor, width: el.strokeWidth, rot: 0, scale: 1 };
+                switch (el.type) {
+                    case "freedraw": s.type = "pen"; s.points = el.points.map(([x, y]) => ({ x, y })); res.push(s); break;
+                    case "line": s.type = "line"; s.x1 = el.points[0][0]; s.y1 = el.points[0][1]; s.x2 = el.points[1][0]; s.y2 = el.points[1][1]; res.push(s); break;
+                    case "rectangle": s.type = "rect"; s.x1 = el.x; s.y1 = el.y; s.x2 = el.x + el.width; s.y2 = el.y + el.height; res.push(s); break;
+                    case "ellipse": const cx = el.x + el.width / 2, cy = el.y + el.height / 2, rx = el.width / 2, ry = el.height / 2; if (Math.abs(rx - ry) < 0.1) { s.type = "circle"; s.x1 = cx; s.y1 = cy; s.x2 = cx + rx; s.y2 = cy; } else { s.type = "ellipse"; s.x1 = cx; s.y1 = cy; s.x2 = cx + rx; s.y2 = cy + ry; } res.push(s); break;
+                    case "text": s.type = "text"; s.x = el.x; s.y = el.y; s.size = el.fontSize; s.content = el.text; res.push(s); break;
+                    case "image": s.type = "image"; s.fileId = el.fileId; s.x = el.x; s.y = el.y; s.width = el.width; s.height = el.height; s.base64 = fileCache.get(el.fileId) || ""; res.push(s); break;
+                }
+            });
+            return res;
+        }
+        function generateSVG(shapes) {
+            let minX = 99999, minY = 99999, maxX = -99999, maxY = -99999;
+            shapes.forEach(s => {
+                const b = getShapeBounds(s);
+                minX = Math.min(minX, b.x); minY = Math.min(minY, b.y); maxX = Math.max(maxX, b.x + b.w); maxY = Math.max(maxY, b.y + b.h);
+            });
+            const pad = 20, w = maxX - minX + pad * 2, h = maxY - minY + pad * 2, ox = minX - pad, oy = minY - pad;
+            let paths = "";
+            shapes.forEach(s => {
+                const c = s.color || "#000", wd = s.width || 1;
+                switch (s.type) {
+                    case "pen": let d = `M${s.points[0].x} ${s.points[0].y}`; s.points.slice(1).forEach(p => d += ` L${p.x} ${p.y}`); paths += `<path d="${d}" stroke="${c}" stroke-width="${wd}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`; break;
+                    case "line": paths += `<line x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke="${c}" stroke-width="${wd}"/>`; break;
+                    case "rect": const rx = Math.min(s.x1, s.x2), ry = Math.min(s.y1, s.y2), rw = Math.abs(s.x2 - s.x1), rh = Math.abs(s.y2 - s.y1); paths += `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" stroke="${c}" stroke-width="${wd}" fill="none"/>`; break;
+                    case "circle": const cr = Math.hypot(s.x2 - s.x1, s.y2 - s.y1); paths += `<circle cx="${s.x1}" cy="${s.y1}" r="${cr}" stroke="${c}" stroke-width="${wd}" fill="none"/>`; break;
+                    case "ellipse": const erx = Math.abs(s.x2 - s.x1), ery = Math.abs(s.y2 - s.y1); paths += `<ellipse cx="${s.x1}" cy="${s.y1}" rx="${erx}" ry="${ery}" stroke="${c}" stroke-width="${wd}" fill="none"/>`; break;
+                    case "text": paths += `<text x="${s.x}" y="${s.y}" font-size="${s.size}" fill="${c}" font-family="sans-serif">${escapeXml(s.content)}</text>`; break;
+                    case "image": paths += `<image x="${s.x}" y="${s.y}" width="${s.width}" height="${s.height}" href="${s.base64}"/>`; break;
+                }
+            });
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${ox} ${oy} ${w} ${h}" style="background:#fff">${paths}</svg>`;
+        }
+        function escapeXml(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+        // 坐标转换
+        function screenToWorld(sx, sy) { return { x: (sx - viewOffsetX) / viewScale, y: (sy - viewOffsetY) / viewScale }; }
+        function worldToScreen(wx, wy) { return { x: wx * viewScale + viewOffsetX, y: wy * viewScale + viewOffsetY }; }
+        function getScreenPos(e) { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+
+        // 包围盒计算
+        function getShapeBounds(shape) {
+            let minX = 999999, minY = 999999, maxX = -999999, maxY = -999999, expand = 6;
+            switch (shape.type) {
+                case "pen": shape.points.forEach(p => { minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); }); break;
+                case "line": case "rect": case "circle": case "ellipse": minX = Math.min(shape.x1, shape.x2); minY = Math.min(shape.y1, shape.y2); maxX = Math.max(shape.x1, shape.x2); maxY = Math.max(shape.y1, shape.y2); break;
+                case "text": minX = shape.x; minY = shape.y - shape.size; maxX = shape.x + shape.content.length * shape.size * 0.6; maxY = shape.y; break;
+                case "image": minX = shape.x; minY = shape.y; maxX = shape.x + shape.width; maxY = shape.y + shape.height; break;
+            }
+            return { x: minX - expand, y: minY - expand, w: maxX - minX + expand * 2, h: maxY - minY + expand * 2 };
+        }
+        // 获取多选群组总包围盒
+        function getGroupBounds() {
+            if (!selectedIndexSet.size) return null;
+            let minX = 999999, minY = 999999, maxX = -999999, maxY = -999999;
+            selectedIndexSet.forEach(idx => {
+                const b = getShapeBounds(shapeHistory[idx]);
+                minX = Math.min(minX, b.x); minY = Math.min(minY, b.y); maxX = Math.max(maxX, b.x + b.w); maxY = Math.max(maxY, b.y + b.h);
+            });
+            return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+        }
+        function pointInBox(px, py, box) { return px >= box.x && px <= box.x + box.w && py >= box.y && py <= box.y; }
+        function rectIntersect(a, b) { return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h); }
+        // 判断鼠标是否命中控制点
+        function hitHandle(wx, wy) {
+            if (!groupBounds) return TRANS_TYPE.NONE;
+            const g = groupBounds;
+            // 缩放右下角
+            const scalePt = { x: g.x + g.w, y: g.y + g.h };
+            if (Math.hypot(wx - scalePt.x, wy - scalePt.y) < handleRadius) return TRANS_TYPE.SCALE;
+            // 旋转顶部中点
+            const rotPt = { x: g.x + g.w / 2, y: g.y - 15 };
+            if (Math.hypot(wx - rotPt.x, wy - rotPt.y) < handleRadius) return TRANS_TYPE.ROTATE;
+            // 群组内部=移动
+            if (pointInBox(wx, wy, g)) return TRANS_TYPE.MOVE;
+            return TRANS_TYPE.NONE;
+        }
+
+        // 画布自适应
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.style.width = canvasWrap.clientWidth + "px";
+            canvas.style.height = canvasWrap.clientHeight + "px";
+            canvas.width = canvasWrap.clientWidth * dpr;
+            canvas.height = canvasWrap.clientHeight * dpr;
+            ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+            renderAll();
+        }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        // 滚轮缩放
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            const sm = getScreenPos(e);
+            const wm = screenToWorld(sm.x, sm.y);
+            let ns = viewScale + (e.deltaY < 0 ? scaleStep : -scaleStep);
+            ns = Math.max(minScale, Math.min(maxScale, ns));
+            viewOffsetX = sm.x - wm.x * ns; viewOffsetY = sm.y - wm.y * ns; viewScale = ns; renderAll();
+        }, { passive: false });
+
+        // 鼠标按下
+        canvas.onmousedown = e => {
+            const sp = getScreenPos(e);
+            const wp = screenToWorld(sp.x, sp.y);
+            startX = wp.x; startY = wp.y; currentX = wp.x; currentY = wp.y;
+            groupBounds = getGroupBounds();
+            const hit = hitHandle(wp.x, wp.y);
+
+            // 命中变换控制点：进入变换模式
+            if (hit !== TRANS_TYPE.NONE) {
+                transformMode = hit;
+                transformStartWorld = { ...wp };
+                transformOrigin = { x: groupBounds.x + groupBounds.w / 2, y: groupBounds.y + groupBounds.h / 2 };
+                transformStartScale = 1;
+                transformStartAngle = Math.atan2(wp.y - transformOrigin.y, wp.x - transformOrigin.x);
+                return;
+            }
+
+            // 查找图形点击
+            let hitIdx = -1;
+            for (let i = shapeHistory.length - 1; i >= 0; i--) {
+                if (pointInBox(wp.x, wp.y, getShapeBounds(shapeHistory[i]))) { hitIdx = i; break; }
+            }
+            if (hitIdx >= 0) {
+                if (e.shiftKey) {
+                    if (selectedIndexSet.has(hitIdx)) selectedIndexSet.delete(hitIdx);
+                    else selectedIndexSet.add(hitIdx);
+                } else {
+                    selectedIndexSet.clear(); selectedIndexSet.add(hitIdx);
+                }
+                groupBounds = getGroupBounds();
+                renderAll();
+                return;
+            }
+
+            // 空白区域：绘制 / 框选
+            if (["pen","line","rect","circle","ellipse"].includes(currentTool)) {
+                isDrawing = true;
+                tempShape = currentTool === "pen" ? { type: "pen", color: strokeColor, width: lineWidth, points: [{x:wp.x,y:wp.y}] } : { type: currentTool, color: strokeColor, width: lineWidth, x1: wp.x, y1: wp.y, x2: wp.x, y2: wp.y };
+            } else if (currentTool === "text") {
+                const txt = prompt("输入文字", "文本");
+                if (txt) pushShapeRecord({ type: "text", x: wp.x, y: wp.y, color: strokeColor, size: lineWidth * 8, content: txt, rot: 0, scale: 1 });
+                return;
+            } else if (currentTool === "image") {
+                alert("请使用上传图片按钮或Ctrl+V粘贴"); return;
+            } else {
+                isBoxSelect = true; boxSelectStart = { ...wp }; boxSelectEnd = { ...wp };
+            }
+            renderAll();
+        };
+
+        // 鼠标移动
+        canvas.onmousemove = e => {
+            const sp = getScreenPos(e);
+            const wp = screenToWorld(sp.x, sp.y);
+            currentX = wp.x; currentY = wp.y;
+
+            // 变换拖拽（移动/缩放/旋转多选群组）
+            if (transformMode !== TRANS_TYPE.NONE && groupBounds) {
+                const dx = wp.x - transformStartWorld.x;
+                const dy = wp.y - transformStartWorld.y;
+                const cx = transformOrigin.x, cy = transformOrigin.y;
+                const selectedItems = [...selectedIndexSet];
+                switch (transformMode) {
+                    case TRANS_TYPE.MOVE:
+                        // 整体平移
+                        selectedItems.forEach(i => {
+                            const s = shapeHistory[i];
+                            if (s.type === "pen") s.points.forEach(p => { p.x += dx; p.y += dy; });
+                            else if (s.type === "image" || s.type === "text") { s.x += dx; s.y += dy; }
+                            else { s.x1 += dx; s.y1 += dy; s.x2 += dx; s.y2 += dy; }
+                        });
+                        transformStartWorld = { ...wp };
+                        break;
+                    case TRANS_TYPE.SCALE:
+                        // 等比缩放
+                        const origDist = Math.hypot(transformStartWorld.x - cx, transformStartWorld.y - cy);
+                        const curDist = Math.hypot(wp.x - cx, wp.y - cy);
+                        let scl = origDist < 0.1 ? 1 : curDist / origDist;
+                        scl = Math.max(0.1, scl);
+                        const deltaS = scl / transformStartScale;
+                        selectedItems.forEach(i => {
+                            const sh = shapeHistory[i];
+                            if (sh.type === "pen") {
+                                sh.points.forEach(p => { p.x = cx + (p.x - cx) * deltaS; p.y = cy + (p.y - cy) * deltaS; });
+                            } else if (sh.type === "image" || sh.type === "text") {
+                                sh.x = cx + (sh.x - cx) * deltaS; sh.y = cy + (sh.y - cy) * deltaS;
+                                if (sh.type === "image") { sh.width *= deltaS; sh.height *= deltaS; }
+                                if (sh.type === "text") sh.size *= deltaS;
+                            } else {
+                                sh.x1 = cx + (sh.x1 - cx) * deltaS; sh.y1 = cy + (sh.y1 - cy) * deltaS;
+                                sh.x2 = cx + (sh.x2 - cx) * deltaS; sh.y2 = cy + (sh.y2 - cy) * deltaS;
+                            }
+                        });
+                        transformStartScale = scl;
+                        break;
+                    case TRANS_TYPE.ROTATE:
+                        // 旋转
+                        const curAng = Math.atan2(wp.y - cy, wp.x - cx);
+                        const dAng = curAng - transformStartAngle;
+                        selectedItems.forEach(i => {
+                            const sh = shapeHistory[i];
+                            const rotatePoint = (px, py) => {
+                                const ox = px - cx, oy = py - cy;
+                                return { x: cx + ox * Math.cos(dAng) - oy * Math.sin(dAng), y: cy + ox * Math.sin(dAng) + oy * Math.cos(dAng) };
+                            };
+                            if (sh.type === "pen") sh.points.forEach(p => ({ x, y } = rotatePoint(p.x, p.y), p.x = x, p.y = y));
+                            else if (sh.type === "image" || sh.type === "text") { const np = rotatePoint(sh.x, sh.y); sh.x = np.x; sh.y = np.y; }
+                            else { const p1 = rotatePoint(sh.x1, sh.y1), p2 = rotatePoint(sh.x2, sh.y2); sh.x1 = p1.x; sh.y1 = p1.y; sh.x2 = p2.x; sh.y2 = p2.y; }
+                        });
+                        transformStartAngle = curAng;
+                        break;
+                }
+                renderAll();
+                return;
+            }
+
+            // 绘制临时图形
+            if (isDrawing && tempShape) {
+                if (tempShape.type === "pen") tempShape.points.push({ x: wp.x, y: wp.y });
+                else { tempShape.x2 = wp.x; tempShape.y2 = wp.y; }
+                renderAll(); return;
+            }
+            // 框选
+            if (isBoxSelect) { boxSelectEnd = { ...wp }; renderAll(); }
+        };
+
+        // 鼠标松开
+        canvas.onmouseup = canvas.onmouseleave = () => {
+            // 变换操作结束，清空变换状态
+            if (transformMode !== TRANS_TYPE.NONE) {
+                transformMode = TRANS_TYPE.NONE;
+                groupBounds = getGroupBounds();
+                renderAll();
+                return;
+            }
+            // 绘制完成保存
+            if (isDrawing && tempShape) {
+                isDrawing = false;
+                pushShapeRecord(JSON.parse(JSON.stringify(tempShape)));
+                tempShape = null; renderAll(); return;
+            }
+            // 框选结束
+            if (isBoxSelect) {
+                isBoxSelect = false;
+                const bx = Math.min(boxSelectStart.x, boxSelectEnd.x);
+                const by = Math.min(boxSelectStart.y, boxSelectEnd.y);
+                const bw = Math.abs(boxSelectEnd.x - boxSelectStart.x);
+                const bh = Math.abs(boxSelectEnd.y - boxSelectStart.y);
+                if (bw > 3 || bh > 3) {
+                    if (!event.shiftKey) selectedIndexSet.clear();
+                    shapeHistory.forEach((sh, idx) => {
+                        if (rectIntersect({ x: bx, y: by, w: bw, h: bh }, getShapeBounds(sh))) selectedIndexSet.add(idx);
+                    });
+                } else if (!event.shiftKey) selectedIndexSet.clear();
+                groupBounds = getGroupBounds(); renderAll();
+            }
+        };
+
+        // 全局渲染
+        function renderAll() {
+            const dpr = window.devicePixelRatio || 1;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, canvasWrap.clientWidth, canvasWrap.clientHeight);
+            ctx.save();
+            ctx.translate(viewOffsetX, viewOffsetY);
+            ctx.scale(viewScale, viewScale);
+
+            // 绘制所有图形
+            shapeHistory.forEach((s, idx) => drawSingleShape(s));
+            if (tempShape) drawSingleShape(tempShape);
+
+            // 绘制选中框+控制点
+            if (selectedIndexSet.size && groupBounds) {
+                const g = groupBounds;
+                // 选中虚线框
+                ctx.strokeStyle = "#2196F3"; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+                ctx.strokeRect(g.x, g.y, g.w, g.h); ctx.setLineDash([]);
+                // 缩放控制点 右下角
+                ctx.fillStyle = "#fff"; ctx.strokeStyle = "#2196F3"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(g.x + g.w, g.y + g.h, handleRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                // 旋转控制点 顶部居中
+                ctx.fillStyle = "#ff7820";
+                const rotX = g.x + g.w / 2; const rotY = g.y - 15;
+                ctx.beginPath(); ctx.arc(rotX, rotY, handleRadius, 0, Math.PI * 2); ctx.fill();
+                // 旋转连线
+                ctx.strokeStyle = "#ff7820"; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+                ctx.beginPath(); ctx.moveTo(rotX, rotY); ctx.lineTo(g.x + g.w / 2, g.y); ctx.stroke(); ctx.setLineDash([]);
+            }
+
+            // 框选预览
+            if (isBoxSelect) {
+                const sx = Math.min(boxSelectStart.x, boxSelectEnd.x);
+                const sy = Math.min(boxSelectStart.y, boxSelectEnd.y);
+                const sw = Math.abs(boxSelectEnd.x - boxSelectStart.x);
+                const sh = Math.abs(boxSelectEnd.y - boxSelectStart.y);
+                ctx.fillStyle = "rgba(33,150,243,0.1)"; ctx.fillRect(sx, sy, sw, sh);
+                ctx.strokeStyle = "#2196F3"; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+                ctx.strokeRect(sx, sy, sw, sh); ctx.setLineDash([]);
+            }
+            ctx.restore();
+        }
+        async function drawSingleShape(shape) {
+            ctx.strokeStyle = shape.color || "#000";
+            ctx.lineWidth = shape.width || 1;
+            ctx.lineCap = "round"; ctx.lineJoin = "round";
+            switch (shape.type) {
+                case "pen":
+                    if (shape.points.length < 2) return;
+                    ctx.beginPath(); ctx.moveTo(shape.points[0].x, shape.points[0].y);
+                    shape.points.forEach(p => ctx.lineTo(p.x, p.y)); ctx.stroke(); break;
+                case "line":
+                    ctx.beginPath(); ctx.moveTo(shape.x1, shape.y1); ctx.lineTo(shape.x2, shape.y2); ctx.stroke(); break;
+                case "rect":
+                    const rx = Math.min(shape.x1, shape.x2), ry = Math.min(shape.y1, shape.y2), rw = Math.abs(shape.x2 - shape.x1), rh = Math.abs(shape.y2 - shape.y1);
+                    ctx.beginPath(); ctx.rect(rx, ry, rw, rh); ctx.stroke(); break;
+                case "circle":
+                    const cr = Math.hypot(shape.x2 - shape.x1, shape.y2 - shape.y1);
+                    ctx.beginPath(); ctx.arc(shape.x1, shape.y1, cr, 0, Math.PI * 2); ctx.stroke(); break;
+                case "ellipse":
+                    const erx = Math.abs(shape.x2 - shape.x1), ery = Math.abs(shape.y2 - shape.y1);
+                    ctx.beginPath(); ctx.ellipse(shape.x1, shape.y1, erx, ery, 0, 0, Math.PI * 2); ctx.stroke(); break;
+                case "text":
+                    ctx.fillStyle = shape.color; ctx.font = `${shape.size}px sans-serif`;
+                    ctx.fillText(shape.content, shape.x, shape.y); break;
+                case "image":
+                    if (!shape.base64) return;
+                    const img = new Image(); img.src = shape.base64;
+                    await new Promise(r => img.onload = r);
+                    ctx.drawImage(img, shape.x, shape.y, shape.width, shape.height); break;
+            }
+        }
+    </script>
+</body>
+</html>

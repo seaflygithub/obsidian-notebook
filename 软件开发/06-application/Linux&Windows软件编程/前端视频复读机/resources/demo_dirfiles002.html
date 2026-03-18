@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>读取文件夹MP4、大小、时长</title>
+<style>
+body { padding: 30px; font-family: system-ui; }
+#selectFolderBtn { padding: 10px 24px; font-size: 16px; cursor: pointer; }
+#result { margin-top: 20px; white-space: pre-wrap; font-size: 13px; background: #f5f5f5; padding: 12px; max-height: 500px; overflow: auto; }
+</style>
+</head>
+<body>
+<button id="selectFolderBtn">选择视频文件夹</button>
+<div id="result"></div>
+<input type="file" id="folderInput" webkitdirectory multiple hidden>
+
+<script>
+const btn = document.getElementById('selectFolderBtn');
+const folderInput = document.getElementById('folderInput');
+const resultBox = document.getElementById('result');
+
+// 字节转 MB
+function bytesToMB(bytes) {
+    return (bytes / 1024 / 1024).toFixed(2);
+}
+
+// 秒格式化 HH:mm:ss.fff
+function formatTime(seconds) {
+    const totalMs = Math.round(seconds * 1000);
+    const h = Math.floor(totalMs / 3600000);
+    const m = Math.floor((totalMs % 3600000) / 60000);
+    const s = Math.floor((totalMs % 60000) / 1000);
+    const ms = totalMs % 1000;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+
+// 获取单个视频时长
+function getVideoDuration(file) {
+    return new Promise((resolve) => {
+        const url = URL.createObjectURL(file);
+        const video = document.createElement('video');
+        video.src = url;
+        video.addEventListener('loadedmetadata', () => {
+            URL.revokeObjectURL(url);
+            resolve(video.duration);
+        });
+        video.addEventListener('error', () => {
+            URL.revokeObjectURL(url);
+            resolve(null);
+        });
+    });
+}
+
+btn.onclick = () => {
+    folderInput.value = '';
+    folderInput.click();
+};
+
+folderInput.onchange = async (e) => {
+    const files = Array.from(e.target.files);
+    const mp4Files = files.filter(f => f.name.toLowerCase().endsWith('.mp4'));
+    const output = [];
+
+    for (const file of mp4Files) {
+        const sec = await getVideoDuration(file);
+        output.push({
+            name: file.name,
+            path: file.webkitRelativePath,
+            sizeMB: bytesToMB(file.size),
+            durationSec: sec,
+            durationStr: sec === null ? '读取失败' : formatTime(sec)
+        });
+    }
+
+    console.log('==== MP4 完整信息列表 ====');
+    console.log(output);
+
+    // 页面展示
+    resultBox.textContent = JSON.stringify(output, null, 2);
+};
+</script>
+</body>
+</html>

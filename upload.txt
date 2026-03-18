@@ -1,0 +1,24 @@
+# github场景: 
+#     1、首先开启上网工具，然后直接下载zip包
+#     2、如果是下载zip包，则需要关联远程仓库
+git init      (如果解压后里面没有.git目录)
+git remote add origin <远程仓库地址>
+git add --all
+git commit -m "你的提交信息"
+git push -f origin master
+
+
+# 后续的覆盖提交操作
+git add --all
+git commit --amend
+git push -f origin master              (choose manager)
+
+
+
+
+
+
+
+
+
+

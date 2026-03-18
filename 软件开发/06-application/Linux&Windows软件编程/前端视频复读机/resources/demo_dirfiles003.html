@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>视频文件夹播放器｜倍速/音量/键盘控制</title>
+<style>
+*{box-sizing: border-box; margin:0; padding:0; font-family: system-ui}
+body{padding:20px; max-width:1400px; margin:0 auto; background:#f7f8fa}
+.top-bar{display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; align-items:center}
+button{padding:8px 14px; cursor:pointer; border:none; border-radius:6px; background:#4080ff; color:#fff; font-size:14px}
+button:disabled{background:#b3c8f0; cursor:not-allowed}
+.loop-group,.speed-group,.vol-group{display:flex; gap:8px; align-items:center}
+label{cursor:pointer; font-size:14px}
+select{padding:6px 8px; border-radius:4px; border:1px solid #ccc}
+input[type="range"]{width:100px}
+.container{display:grid; grid-template-columns: 660px 1fr; gap:20px}
+#videoBox{background:#000; border-radius:8px; overflow:hidden}
+video{width:100%; display:block}
+#videoList{background:#fff; border:1px solid #e5e7eb; border-radius:8px; height:520px; overflow-y:auto}
+.video-item{padding:10px 14px; border-bottom:1px solid #f0f0f0; cursor:pointer}
+.video-item:hover{background:#f0f7ff}
+.video-item.active{background:#e6f0ff; color:#0052cc}
+.item-name{font-weight:500}
+.item-info{font-size:12px; color:#666; margin-top:4px}
+#tip{margin-top:12px; color:#666}
+.ctrl-row{display:flex; gap:16px; margin:10px 0; flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="top-bar">
+    <button id="selectFolderBtn">选择视频文件夹</button>
+    <div class="loop-group">
+        <span>循环：</span>
+        <label><input type="radio" name="loopMode" value="none" checked> 不循环</label>
+        <label><input type="radio" name="loopMode" value="single"> 单集循环</label>
+        <label><input type="radio" name="loopMode" value="list"> 列表循环</label>
+    </div>
+    <div class="speed-group">
+        <span>倍速：</span>
+        <select id="speedSelect">
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="1.75">1.75x</option>
+            <option value="2">2.0x</option>
+            <option value="4">4.0x</option>
+        </select>
+    </div>
+    <div class="vol-group">
+        <span>音量：</span>
+        <input type="range" id="volSlider" min="0" max="1" step="0.05" value="1">
+        <span id="volText">100%</span>
+    </div>
+    <button id="prevBtn" disabled>上一个</button>
+    <button id="nextBtn" disabled>下一个</button>
+</div>
+<div class="ctrl-row">
+    <span>快捷键：← 回退5秒 / → 快进5秒</span>
+</div>
+
+<div class="container">
+    <div id="videoBox">
+        <video id="player" controls></video>
+    </div>
+    <div id="videoList"></div>
+</div>
+<div id="tip">请先选择视频文件夹，F12控制台查看文件信息</div>
+
+<input type="file" id="folderInput" webkitdirectory multiple hidden>
+
+<script>
+// 全局状态
+let mp4List = [];
+let currentIndex = -1;
+let loopMode = 'none'; // none / single / list
+const STEP_SEC = 5; // 左右键进退5秒
+
+const folderInput = document.getElementById('folderInput');
+const selectFolderBtn = document.getElementById('selectFolderBtn');
+const player = document.getElementById('player');
+const videoListDom = document.getElementById('videoList');
+const tipDom = document.getElementById('tip');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const loopRadios = document.querySelectorAll('input[name="loopMode"]');
+const speedSelect = document.getElementById('speedSelect');
+const volSlider = document.getElementById('volSlider');
+const volText = document.getElementById('volText');
+
+// 工具函数
+function bytesToMB(bytes) {
+    return (bytes / 1024 / 1024).toFixed(2);
+}
+function formatTime(seconds) {
+    if (seconds === null || isNaN(seconds)) return '读取失败';
+    const totalMs = Math.round(seconds * 1000);
+    const h = Math.floor(totalMs / 3600000);
+    const m = Math.floor((totalMs % 3600000) / 60000);
+    const s = Math.floor((totalMs % 60000) / 1000);
+    const ms = totalMs % 1000;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+function getVideoDuration(file) {
+    return new Promise((resolve) => {
+        const url = URL.createObjectURL(file);
+        const tempVideo = document.createElement('video');
+        tempVideo.src = url;
+        tempVideo.addEventListener('loadedmetadata', () => {
+            URL.revokeObjectURL(url);
+            resolve(tempVideo.duration);
+        });
+        tempVideo.addEventListener('error', () => {
+            URL.revokeObjectURL(url);
+            resolve(null);
+        });
+    });
+}
+
+// 渲染视频列表
+function renderList() {
+    videoListDom.innerHTML = '';
+    mp4List.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'video-item' + (idx === currentIndex ? ' active' : '');
+        div.dataset.index = idx;
+        div.innerHTML = `
+            <div class="item-name">${item.name}</div>
+            <div class="item-info">大小：${item.sizeMB}MB | 时长：${item.durationStr}</div>
+        `;
+        div.onclick = () => playByIndex(idx);
+        videoListDom.appendChild(div);
+    });
+    updateBtnState();
+}
+
+// 更新上下按钮禁用状态
+function updateBtnState() {
+    prevBtn.disabled = mp4List.length === 0 || currentIndex <= 0;
+    nextBtn.disabled = mp4List.length === 0 || currentIndex >= mp4List.length - 1;
+}
+
+// 根据索引播放视频
+function playByIndex(idx) {
+    if (idx < 0 || idx >= mp4List.length) return;
+    currentIndex = idx;
+    const file = mp4List[idx].file;
+    const url = URL.createObjectURL(file);
+    player.src = url;
+    player.play();
+    renderList();
+}
+
+// 1. 倍速切换
+speedSelect.onchange = () => {
+    player.playbackRate = Number(speedSelect.value);
+};
+
+// 2. 音量控制
+volSlider.oninput = () => {
+    const vol = Number(volSlider.value);
+    player.volume = vol;
+    volText.textContent = Math.round(vol * 100) + '%';
+};
+
+// 3. 键盘左右快进回退
+document.addEventListener('keydown', (e) => {
+    if (!player.src) return;
+    if (e.key === 'ArrowLeft') {
+        player.currentTime = Math.max(0, player.currentTime - STEP_SEC);
+    } else if (e.key === 'ArrowRight') {
+        player.currentTime = Math.min(player.duration, player.currentTime + STEP_SEC);
+    }
+});
+
+// 4. 视频播放结束循环逻辑
+player.addEventListener('ended', () => {
+    if (loopMode === 'single') {
+        player.currentTime = 0;
+        player.play();
+    } else if (loopMode === 'list') {
+        if (currentIndex < mp4List.length - 1) {
+            playByIndex(currentIndex + 1);
+        } else {
+            playByIndex(0);
+        }
+    }
+});
+
+// 上下切换
+prevBtn.onclick = () => {
+    if (currentIndex > 0) playByIndex(currentIndex - 1);
+};
+nextBtn.onclick = () => {
+    if (currentIndex < mp4List.length - 1) playByIndex(currentIndex + 1);
+};
+
+// 切换循环模式
+loopRadios.forEach(radio => {
+    radio.onchange = () => {
+        loopMode = radio.value;
+    };
+});
+
+// 选择文件夹
+selectFolderBtn.onclick = () => {
+    folderInput.value = '';
+    folderInput.click();
+};
+
+folderInput.onchange = async (e) => {
+    const files = Array.from(e.target.files);
+    const rawMp4 = files.filter(f => f.name.toLowerCase().endsWith('.mp4'));
+    mp4List = [];
+    currentIndex = -1;
+    player.src = '';
+    tipDom.textContent = '正在读取视频时长，请稍候...';
+
+    for (const file of rawMp4) {
+        const sec = await getVideoDuration(file);
+        mp4List.push({
+            file,
+            name: file.name,
+            path: file.webkitRelativePath,
+            sizeMB: bytesToMB(file.size),
+            durationSec: sec,
+            durationStr: formatTime(sec)
+        });
+    }
+
+    console.log('==== MP4完整文件列表 ====');
+    console.log(mp4List);
+    tipDom.textContent = `共读取到 ${mp4List.length} 个MP4视频，点击列表播放`;
+    renderList();
+};
+</script>
+</body>
+</html>

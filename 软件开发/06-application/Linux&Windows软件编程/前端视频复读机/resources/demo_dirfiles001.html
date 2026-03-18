@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>选择视频文件夹并列出MP4</title>
+    <style>
+        body { padding: 30px; font-family: Arial, sans-serif; }
+        #selectFolderBtn {
+            padding: 10px 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .tip { margin-top: 16px; color: #666; }
+    </style>
+</head>
+<body>
+    <button id="selectFolderBtn">选择视频文件夹</button>
+    <div class="tip">打开控制台F12查看所有mp4文件列表</div>
+
+    <!-- 隐藏文件夹选择input -->
+    <input type="file" id="folderInput" webkitdirectory multiple hidden>
+
+    <script>
+        const btn = document.getElementById('selectFolderBtn');
+        const folderInput = document.getElementById('folderInput');
+
+        // 点击按钮触发文件夹选择弹窗
+        btn.addEventListener('click', () => {
+            folderInput.value = ''; // 清空上次选择缓存
+            folderInput.click();
+        });
+
+        // 选中文件夹后处理文件
+        folderInput.addEventListener('change', (e) => {
+            const fileList = Array.from(e.target.files);
+            // 筛选仅 .mp4 文件（忽略大小写 .MP4）
+            const mp4List = fileList.filter(file => {
+                const ext = file.name.toLowerCase().split('.').pop();
+                return ext === 'mp4';
+            });
+
+            console.log('===== 文件夹内所有MP4文件 =====');
+            console.log(mp4List);
+            console.log('MP4文件名数组：', mp4List.map(item => item.name));
+            console.log('文件相对路径：', mp4List.map(item => item.webkitRelativePath));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兼容Excalidraw矢量草稿画板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui; }
+        body { overflow: hidden; background: #f5f5f5; display: flex; flex-direction: column; height: 100vh; }
+
+        /* 顶部工具栏 */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: #222;
+            color: #fff;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .tool-group { display: flex; gap: 6px; align-items: center; padding: 0 8px; border-right: 1px solid #555; }
+        .tool-group:last-child { border-right: none; }
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #444;
+            color: white;
+        }
+        button.active { background: #2196F3; }
+        input[type="color"] { width: 36px; height: 32px; cursor: pointer; border: none; }
+        input[type="number"] { width: 60px; padding: 4px; }
+        label { font-size: 13px; margin-right: 4px; }
+        input[type="file"] { display: none; }
+
+        /* Canvas铺满屏幕 */
+        #canvasWrap { flex: 1; position: relative; }
+        #drawCanvas {
+            display: block;
+            background: #ffffff;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <!-- 绘图工具切换 -->
+        <div class="tool-group">
+            <button data-tool="pen" class="active">画笔</button>
+            <button data-tool="line">直线</button>
+            <button data-tool="rect">矩形</button>
+            <button data-tool="circle">正圆</button>
+            <button data-tool="ellipse">椭圆</button>
+            <button data-tool="text">文字</button>
+        </div>
+
+        <!-- 颜色与线条粗细 -->
+        <div class="tool-group">
+            <label>颜色:</label>
+            <input type="color" id="strokeColor" value="#000000">
+            <label>线宽:</label>
+            <input type="number" id="lineWidth" min="1" max="50" value="3">
+        </div>
+
+        <!-- 画布操作 -->
+        <div class="tool-group">
+            <button id="undoBtn">撤销</button>
+            <button id="clearBtn">清空画布</button>
+        </div>
+
+        <!-- 文件操作（兼容Excalidraw） -->
+        <div class="tool-group">
+            <input type="file" id="fileInput" accept=".excalidraw,json"/>
+            <button id="openFileBtn">打开.excalidraw</button>
+            <button id="saveExcalBtn">保存.excalidraw</button>
+            <button id="exportSvgBtn">导出SVG</button>
+        </div>
+    </div>
+
+    <div id="canvasWrap">
+        <canvas id="drawCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWrap = document.getElementById('canvasWrap');
+
+        // 全局绘图状态
+        let currentTool = 'pen';
+        let strokeColor = '#000000';
+        let lineWidth = 3;
+        let isDrawing = false;
+        let startX = 0, startY = 0;
+        let currentX = 0, currentY = 0;
+        let tempShape = null;
+        // 内部矢量图形数组（导出时转为Excalidraw element格式）
+        let shapeHistory = [];
+
+        // ========== 工具按钮绑定 ==========
+        document.querySelectorAll('[data-tool]').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+            };
+        });
+        document.getElementById('strokeColor').oninput = e => strokeColor = e.target.value;
+        document.getElementById('lineWidth').oninput = e => lineWidth = Number(e.target.value);
+        document.getElementById('undoBtn').onclick = () => {
+            if (shapeHistory.length) shapeHistory.pop();
+            renderAll();
+        };
+        document.getElementById('clearBtn').onclick = () => {
+            shapeHistory = [];
+            renderAll();
+        };
+
+        // ========== 文件操作 ==========
+        const fileInput = document.getElementById('fileInput');
+        document.getElementById('openFileBtn').onclick = () => fileInput.click();
+        // 读取.excalidraw文件
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const text = await file.text();
+            try {
+                const rawData = JSON.parse(text);
+                // 兼容标准excalidraw文件结构
+                if (!rawData.elements) throw new Error("非Excalidraw格式");
+                // 将Excalidraw标准elements转为本地绘图数据
+                shapeHistory = convertExcalToLocal(rawData.elements);
+                renderAll();
+                alert("文件加载成功");
+            } catch (err) {
+                alert("加载失败：" + err.message);
+                console.error(err);
+            }
+            fileInput.value = "";
+        };
+
+        // 保存 .excalidraw 工程文件（标准Excalidraw JSON结构）
+        document.getElementById('saveExcalBtn').onclick = () => {
+            const exData = {
+                type: "excalidraw",
+                version: 2,
+                source: "https://excalidraw.com",
+                elements: convertLocalToExcal(shapeHistory),
+                appState: { viewBackgroundColor: "#ffffff" }
+            };
+            downloadFile(JSON.stringify(exData, null, 2), "drawing.excalidraw", "application/json");
+        };
+
+        // 导出SVG矢量图
+        document.getElementById('exportSvgBtn').onclick = () => {
+            const svgCode = generateSVG(shapeHistory);
+            downloadFile(svgCode, "drawing.svg", "image/svg+xml");
+        };
+
+        // 文件下载通用方法
+        function downloadFile(content, filename, mime) {
+            const blob = new Blob([content], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========== Excalidraw 数据格式互转核心 ==========
+        // 本地图形数组 → Excalidraw标准elements
+        function convertLocalToExcal(shapes) {
+            return shapes.map((s, idx) => {
+                const base = {
+                    id: "elem_" + Date.now() + "_" + idx,
+                    strokeColor: s.color,
+                    strokeWidth: s.width,
+                    fillStyle: "none",
+                    strokeStyle: "solid",
+                    opacity: 100,
+                    version: 1,
+                    versionNonce: Math.random(),
+                    seed: Math.floor(Math.random() * 999999),
+                    groupIds: [],
+                    boundElements: null,
+                    updated: Date.now(),
+                    link: null,
+                    locked: false
+                };
+                switch (s.type) {
+                    case "pen":
+                        return {
+                            ...base,
+                            type: "freedraw",
+                            x: 0, y: 0, width: 0, height: 0,
+                            points: s.points.map(p => [p.x, p.y])
+                        };
+                    case "line":
+                        return {
+                            ...base, type: "line",
+                            x: Math.min(s.x1, s.x2), y: Math.min(s.y1, s.y2),
+                            width: Math.abs(s.x2 - s.x1), height: Math.abs(s.y2 - s.y1),
+                            points: [[s.x1, s.y1], [s.x2, s.y2]]
+                        };
+                    case "rect":
+                        const rx = Math.min(s.x1, s.x2);
+                        const ry = Math.min(s.y1, s.y2);
+                        const rw = Math.abs(s.x2 - s.x1);
+                        const rh = Math.abs(s.y2 - s.y1);
+                        return { ...base, type: "rectangle", x: rx, y: ry, width: rw, height: rh };
+                    case "circle":
+                        const cr = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+                        return {
+                            ...base, type: "ellipse",
+                            x: s.x1 - cr, y: s.y1 - cr, width: cr * 2, height: cr * 2
+                        };
+                    case "ellipse":
+                        const erx = Math.abs(s.x2 - s.x1);
+                        const ery = Math.abs(s.y2 - s.y1);
+                        return {
+                            ...base, type: "ellipse",
+                            x: s.x1 - erx, y: s.y1 - ery, width: erx * 2, height: ery * 2
+                        };
+                    case "text":
+                        return {
+                            ...base, type: "text",
+                            x: s.x, y: s.y,
+                            fontSize: s.size,
+                            fontFamily: 1,
+                            text: s.content,
+                            textAlign: "left",
+                            verticalAlign: "top"
+                        };
+                    default: return base;
+                }
+            });
+        }
+
+        // Excalidraw标准elements → 本地绘图数据
+        function convertExcalToLocal(elements) {
+            const res = [];
+            elements.forEach(el => {
+                const s = { color: el.strokeColor, width: el.strokeWidth };
+                switch (el.type) {
+                    case "freedraw":
+                        s.type = "pen";
+                        s.points = el.points.map(([x, y]) => ({ x, y }));
+                        res.push(s); break;
+                    case "line":
+                        s.type = "line";
+                        s.x1 = el.points[0][0]; s.y1 = el.points[0][1];
+                        s.x2 = el.points[1][0]; s.y2 = el.points[1][1];
+                        res.push(s); break;
+                    case "rectangle":
+                        s.type = "rect";
+                        s.x1 = el.x; s.y1 = el.y;
+                        s.x2 = el.x + el.width; s.y2 = el.y + el.height;
+                        res.push(s); break;
+                    case "ellipse":
+                        const cx = el.x + el.width / 2;
+                        const cy = el.y + el.height / 2;
+                        const rx = el.width / 2;
+                        const ry = el.height / 2;
+                        // 判断正圆/椭圆
+                        if (Math.abs(rx - ry) < 0.1) {
+                            s.type = "circle";
+                            s.x1 = cx; s.y1 = cy;
+                            s.x2 = cx + rx; s.y2 = cy;
+                        } else {
+                            s.type = "ellipse";
+                            s.x1 = cx; s.y1 = cy;
+                            s.x2 = cx + rx; s.y2 = cy + ry;
+                        }
+                        res.push(s); break;
+                    case "text":
+                        s.type = "text";
+                        s.x = el.x; s.y = el.y;
+                        s.size = el.fontSize;
+                        s.content = el.text;
+                        res.push(s); break;
+                }
+            });
+            return res;
+        }
+
+        // ========== 生成SVG矢量文件代码 ==========
+        function generateSVG(shapes) {
+            let minX = 99999, minY = 99999, maxX = 0, maxY = 0;
+            // 计算画布边界
+            shapes.forEach(s => {
+                const pts = [];
+                if (s.type === "pen") s.points.forEach(p => pts.push([p.x, p.y]));
+                else if (["line","rect","circle","ellipse"].includes(s.type)) {
+                    pts.push([s.x1, s.y1], [s.x2, s.y2]);
+                } else if (s.type === "text") pts.push([s.x, s.y]);
+                pts.forEach(([x,y]) => {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                });
+            });
+            const padding = 20;
+            const w = maxX - minX + padding * 2;
+            const h = maxY - minY + padding * 2;
+            const ox = minX - padding;
+            const oy = minY - padding;
+
+            let paths = "";
+            shapes.forEach(s => {
+                const c = s.color;
+                const wd = s.width;
+                switch (s.type) {
+                    case "pen":
+                        let d = `M${s.points[0].x} ${s.points[0].y}`;
+                        s.points.slice(1).forEach(p => d += ` L${p.x} ${p.y}`);
+                        paths += `<path d="${d}" stroke="${c}" stroke-width="${wd}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+                        break;
+                    case "line":
+                        paths += `<line x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke="${c}" stroke-width="${wd}"/>`;
+                        break;
+                    case "rect":
+                        const rx = Math.min(s.x1, s.x2);
+                        const ry = Math.min(s.y1, s.y2);
+                        const rw = Math.abs(s.x2 - s.x1);
+                        const rh = Math.abs(s.y2 - s.y1);
+                        paths += `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" stroke="${c}" stroke-width="${wd}" fill="none"/>`;
+                        break;
+                    case "circle":
+                        const cr = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+                        paths += `<circle cx="${s.x1}" cy="${s.y1}" r="${cr}" stroke="${c}" stroke-width="${wd}" fill="none"/>`;
+                        break;
+                    case "ellipse":
+                        const erx = Math.abs(s.x2 - s.x1);
+                        const ery = Math.abs(s.y2 - s.y1);
+                        paths += `<ellipse cx="${s.x1}" cy="${s.y1}" rx="${erx}" ry="${ery}" stroke="${c}" stroke-width="${wd}" fill="none"/>`;
+                        break;
+                    case "text":
+                        paths += `<text x="${s.x}" y="${s.y}" font-size="${s.size}" fill="${c}" font-family="sans-serif">${escapeXml(s.content)}</text>`;
+                        break;
+                }
+            });
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${ox} ${oy} ${w} ${h}" style="background:#fff">${paths}</svg>`;
+        }
+        function escapeXml(str) {
+            return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        }
+
+        // ========== 画布自适应与鼠标绘图逻辑 ==========
+        function resizeCanvas() {
+            canvas.width = canvasWrap.clientWidth;
+            canvas.height = canvasWrap.clientHeight;
+            renderAll();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
+
+        canvas.onmousedown = e => {
+            isDrawing = true;
+            const pos = getPos(e);
+            startX = pos.x; startY = pos.y; currentX = pos.x; currentY = pos.y;
+            if (currentTool === 'pen') {
+                tempShape = { type: 'pen', color: strokeColor, width: lineWidth, points: [{x: startX, y: startY}] };
+            } else if (currentTool === 'text') {
+                const text = prompt('输入文字：', '文字');
+                if (text) {
+                    shapeHistory.push({ type: 'text', x: startX, y: startY, color: strokeColor, size: lineWidth * 8, content: text });
+                    renderAll();
+                }
+                isDrawing = false;
+            } else {
+                tempShape = { type: currentTool, color: strokeColor, width: lineWidth, x1: startX, y1: startY, x2: startX, y2: startY };
+            }
+        };
+        canvas.onmousemove = e => {
+            if (!isDrawing || !tempShape) return;
+            const pos = getPos(e);
+            currentX = pos.x; currentY = pos.y;
+            if (tempShape.type === 'pen') tempShape.points.push({x: currentX, y: currentY});
+            else { tempShape.x2 = currentX; tempShape.y2 = currentY; }
+            renderAll();
+        };
+        canvas.onmouseup = canvas.onmouseleave = () => {
+            if (!isDrawing || !tempShape) return;
+            isDrawing = false;
+            shapeHistory.push(JSON.parse(JSON.stringify(tempShape)));
+            tempShape = null;
+            renderAll();
+        };
+
+        // 全局渲染
+        function renderAll() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            shapeHistory.forEach(shape => drawSingleShape(shape));
+            if (tempShape) drawSingleShape(tempShape);
+        }
+        function drawSingleShape(shape) {
+            ctx.strokeStyle = shape.color;
+            ctx.lineWidth = shape.width;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            switch (shape.type) {
+                case 'pen':
+                    if (shape.points.length < 2) return;
+                    ctx.beginPath();
+                    ctx.moveTo(shape.points[0].x, shape.points[0].y);
+                    shape.points.forEach(p => ctx.lineTo(p.x, p.y));
+                    ctx.stroke(); break;
+                case 'line':
+                    ctx.beginPath(); ctx.moveTo(shape.x1, shape.y1); ctx.lineTo(shape.x2, shape.y2); ctx.stroke(); break;
+                case 'rect':
+                    const rx = Math.min(shape.x1, shape.x2), ry = Math.min(shape.y1, shape.y2);
+                    const rw = Math.abs(shape.x2 - shape.x1), rh = Math.abs(shape.y2 - shape.y1);
+                    ctx.beginPath(); ctx.rect(rx, ry, rw, rh); ctx.stroke(); break;
+                case 'circle':
+                    const cr = Math.hypot(shape.x2 - shape.x1, shape.y2 - shape.y1);
+                    ctx.beginPath(); ctx.arc(shape.x1, shape.y1, cr, 0, Math.PI * 2); ctx.stroke(); break;
+                case 'ellipse':
+                    const erx = Math.abs(shape.x2 - shape.x1), ery = Math.abs(shape.y2 - shape.y1);
+                    ctx.beginPath(); ctx.ellipse(shape.x1, shape.y1, erx, ery, 0, 0, Math.PI * 2); ctx.stroke(); break;
+                case 'text':
+                    ctx.fillStyle = shape.color;
+                    ctx.font = `${shape.size}px sans-serif`;
+                    ctx.fillText(shape.content, shape.x, shape.y); break;
+            }
+        }
+    </script>
+</body>
+</html>
