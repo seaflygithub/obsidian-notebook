@@ -1,0 +1,262 @@
+{
+  "main": {
+    "id": "1dc1962e4e2fb574",
+    "type": "split",
+    "children": [
+      {
+        "id": "f46c1f3439804a60",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "edebf4f587524f3d",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/游戏逆向导图.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "76ed9c4c644f8a64",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/resources/第07阶段UE专题.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "a4911ac27a014a9c",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/resources/LV06阶段windows内核驱动.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "e4db3e06a93ead95",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/LV7-UE引擎专题.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b491e31a2b3c012c",
+    "type": "split",
+    "children": [
+      {
+        "id": "d5410c66d47d08f7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6ccecd63e8d1100d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "d1e3c585f2bff57e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "2aee3c6c7a460e9a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 398.5
+  },
+  "right": {
+    "id": "0f35758715285bfd",
+    "type": "split",
+    "children": [
+      {
+        "id": "03837f8ae02b621c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "90fa4d4f65bb557f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/resources/LV06阶段windows内核驱动.excalidraw.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": true,
+                "searchQuery": "Linux内核代码分析",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "dd4c1a41c456d1a5",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/resources/LV06阶段windows内核驱动.excalidraw.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "d124327dd3cea4e8",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "5558e19a50b412fa",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": true,
+                "searchQuery": ""
+              }
+            }
+          },
+          {
+            "id": "d8cc6d56b0eb5c62",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/resources/LV06阶段windows内核驱动.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "dd89d3ca38415146",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {}
+            }
+          },
+          {
+            "id": "27124631f496bc8c",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw-sidepanel",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 339.5,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "markdown-importer:打开 Markdown 格式转换器": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "webpage-html-export:Export Vault to HTML": false
+    }
+  },
+  "active": "6ccecd63e8d1100d",
+  "lastOpenFiles": [
+    "软件开发/06-application/微尘C++游戏逆向/VC++复用代码.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/LV06阶段windows内核驱动.excalidraw.md",
+    "软件开发/06-application/科幻《超能查派》/数字神经元.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/第07阶段UE专题.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/LV7-UE引擎专题.md",
+    "软件开发/06-application/微尘C++游戏逆向/LV6-Windows内核驱动.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518093756_498.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518093536_374.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518093303_887.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518093030_924.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518092950_867.png",
+    "软件开发/06-application/微尘C++游戏逆向/游戏逆向导图.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518005315_112.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260518005153_885.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260517230815_399.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260517230608_594.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260517230510_807.png",
+    "软件开发/驱动-zynq系列/zu48dr-adc.md",
+    "软件开发/驱动-zynq系列/ZYNQ7000笔记/zu48dr-adc.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/ZYNQPL快速学习导图.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-Native FIFO使用基础.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/LV2-网络游戏基础.md",
+    "软件开发/03-kernel/Linux内核工程师/Linux内核工程师.md",
+    "软件开发/06-application/科幻《超能查派》/resources",
+    "软件开发/06-application/科幻《超能查派》",
+    "软件开发/06-application/微尘C++游戏逆向/resources/游戏检测技术思路.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/实验：硬件断点Hook劫持实现dump预加载Lua.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Lua脚本语言专题.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/深入理解跨时钟域CDC.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-多时钟域数据缓存.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-ILA调试抓信号基础.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/深入理解跨时钟域CDC.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/FPGA开发环境配置.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-数据源模块及其仿真.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/VC汇编文件和inlineHook劫持.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/ZYNQPL快速学习路线图.md",
+    "软件开发/05-drivers/ZYNQ AXI DMA 系列/zynq-axi-dma.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/课程目录.md",
+    "软件开发/06-application/理工学图（架构师思维）/resources",
+    "软件开发/06-application/理工学图（架构师思维）/03-Linux内核架构.excalidraw",
+    "软件开发/07-experience/项目经验/resources",
+    "软件开发/07-experience/项目经验",
+    "软件开发/05-drivers/can2pcie/resources",
+    "软件开发/05-drivers/can2pcie",
+    "Excalidraw/Scripts/Downloaded",
+    "Excalidraw/Scripts",
+    "未命名.canvas"
+  ]
+}

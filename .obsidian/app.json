@@ -1,0 +1,16 @@
+{
+  "showUnsupportedFiles": true,
+  "attachmentFolderPath": "./",
+  "newFileLocation": "root",
+  "showLineNumber": false,
+  "spellcheck": false,
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "A4",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  },
+  "alwaysUpdateLinks": true,
+  "newLinkFormat": "shortest"
+}
