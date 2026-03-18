@@ -1,0 +1,283 @@
+{
+  "main": {
+    "id": "1dc1962e4e2fb574",
+    "type": "split",
+    "children": [
+      {
+        "id": "f46c1f3439804a60",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "edebf4f587524f3d",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/游戏逆向导图.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "3d96219b892c079d",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/resources/实验：硬件断点Hook劫持实现dump预加载Lua.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "7396446ab5ad215e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/LV2-网络游戏基础.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "a1536256db17f87b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "软件开发/03-kernel/Linux内核工程师/Linux内核工程师.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "be1dc491fa603ec7",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/05-drivers/ZYNQPL快速学习/ZYNQPL快速学习导图.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "f6e462fe4e4ad302",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-Native FIFO使用基础.excalidraw.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b491e31a2b3c012c",
+    "type": "split",
+    "children": [
+      {
+        "id": "d5410c66d47d08f7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6ccecd63e8d1100d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "d1e3c585f2bff57e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "2aee3c6c7a460e9a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 339.5
+  },
+  "right": {
+    "id": "0f35758715285bfd",
+    "type": "split",
+    "children": [
+      {
+        "id": "03837f8ae02b621c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "90fa4d4f65bb557f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/LV2-网络游戏基础.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": true,
+                "searchQuery": "Linux内核代码分析",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "dd4c1a41c456d1a5",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/LV2-网络游戏基础.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "d124327dd3cea4e8",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "5558e19a50b412fa",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": true,
+                "searchQuery": ""
+              }
+            }
+          },
+          {
+            "id": "d8cc6d56b0eb5c62",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "软件开发/06-application/微尘C++游戏逆向/LV2-网络游戏基础.md"
+              }
+            }
+          },
+          {
+            "id": "dd89d3ca38415146",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {}
+            }
+          },
+          {
+            "id": "27124631f496bc8c",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw-sidepanel",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 339.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "markdown-importer:打开 Markdown 格式转换器": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "webpage-html-export:Export Vault to HTML": false
+    }
+  },
+  "active": "7396446ab5ad215e",
+  "lastOpenFiles": [
+    "软件开发/06-application/微尘C++游戏逆向/Pasted image 20260430161632.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/实验：硬件断点Hook劫持实现dump预加载Lua.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/游戏逆向导图.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Lua脚本语言专题.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/LV2-网络游戏基础.md",
+    "软件开发/03-kernel/Linux内核工程师/Linux内核工程师.md",
+    "软件开发/06-application/微尘C++游戏逆向/VC++复用代码.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-Native FIFO使用基础.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/ZYNQPL快速学习导图.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/深入理解跨时钟域CDC.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-多时钟域数据缓存.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-ILA调试抓信号基础.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/深入理解跨时钟域CDC.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted Image 20260429091856_239.png",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted Image 20260429091610_197.png",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/FPGA开发环境配置.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted image 20260428110537.png",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/实验-数据源模块及其仿真.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted Image 20260428091829_516.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/VC汇编文件和inlineHook劫持.excalidraw.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted Image 20260427165540_881.png",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/ZYNQPL快速学习路线图.md",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted Image 20260427160419_335.png",
+    "软件开发/05-drivers/ZYNQPL快速学习/resources/Pasted Image 20260427151321_694.png",
+    "软件开发/05-drivers/ZYNQ AXI DMA 系列/zynq-axi-dma.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/课程目录.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/游戏逆向-技术交流群.md",
+    "软件开发/06-application/微尘C++游戏逆向/Lua脚本语言专题.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/x86_64网络公共call寻找.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/x86_64网络公共call寻找.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/网络公共call寻找.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/VC汇编文件和inlineHook劫持.excalidraw - 副本.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/草稿-微尘游戏逆向.excalidraw.md",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260426125230_084.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260426125230_070.png",
+    "软件开发/06-application/微尘C++游戏逆向/resources/Pasted Image 20260423180322_674.png",
+    "软件开发/06-application/理工学图（架构师思维）/resources",
+    "软件开发/06-application/理工学图（架构师思维）/03-Linux内核架构.excalidraw",
+    "软件开发/07-experience/项目经验/resources",
+    "软件开发/07-experience/项目经验",
+    "软件开发/05-drivers/can2pcie/resources",
+    "软件开发/05-drivers/can2pcie",
+    "Excalidraw/Scripts/Downloaded",
+    "Excalidraw/Scripts",
+    "未命名.canvas",
+    "软件开发/07-experience/resources",
+    "软件开发/03-kernel/Linux内核工程师/resources"
+  ]
+}

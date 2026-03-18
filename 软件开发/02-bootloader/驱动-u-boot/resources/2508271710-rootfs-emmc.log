@@ -1,0 +1,950 @@
+
+zynq> 
+zynq> 
+zynq> reboot
+The system is going down NOW!
+Sent SIGTERM to all processes
+Sent SIGKILL to all processes
+Requesting system reboot
+reboot: Restarting system
+
+Xilinx First Stage Boot Loader 
+Release 2020.2  Jun  9 2025-10:56:08
+Devcfg driver initialized 
+Silicon Version 3.1
+Boot mode is QSPI
+Single Flash Information
+FlashID=0x20 0xBA 0x19
+MICRON 256M Bits
+QSPI is in Dual Parallel connection
+QSPI Init Done 
+Flash Base Address: 0xFC000000
+Reboot status register: 0x60480000
+Multiboot Register: 0x0000C000
+Image Start Address: 0x00000000
+Partition Header Offset:0x00000C80
+Partition Count: 6
+Partition Number: 1
+Header Dump
+Image Word Len: 0x0032D130
+Data Word Len: 0x0032D130
+Partition Word Len:0x0032D130
+Load Addr: 0x00000000
+Exec Addr: 0x00000000
+Partition Start: 0x000075D0
+Partition Attr: 0x00000020
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFF67142E
+Bitstream
+In FsblHookBeforeBitstreamDload function 
+PCAP:StatusReg = 0x40000A30
+PCAP:device ready
+PCAP:Clear done
+Level Shifter Value = 0xA 
+Devcfg Status register = 0x40000A30 
+PCAP:Fabric is Initialized done
+PCAP register dump:
+PCAP CTRL 0xF8007000: 0x4C00E07F
+PCAP LOCK 0xF8007004: 0x0000001A
+PCAP CONFIG 0xF8007008: 0x00000508
+PCAP ISR 0xF800700C: 0x0802000B
+PCAP IMR 0xF8007010: 0xFFFFFFFF
+PCAP STATUS 0xF8007014: 0x00005A30
+PCAP DMA SRC ADDR 0xF8007018: 0x00100001
+PCAP DMA DEST ADDR 0xF800701C: 0xFFFFFFFF
+PCAP DMA SRC LEN 0xF8007020: 0x0032D130
+PCAP DMA DEST LEN 0xF8007024: 0x0032D130
+PCAP ROM SHADOW CTRL 0xF8007028: 0xFFFFFFFF
+PCAP MBOOT 0xF800702C: 0x0000C000
+PCAP SW ID 0xF8007030: 0x00000000
+PCAP UNLOCK 0xF8007034: 0x757BDF0D
+PCAP MCTRL 0xF8007080: 0x30800100
+...................................................................................................
+DMA Done ! 
+
+FPGA Done ! 
+In FsblHookAfterBitstreamDload function 
+Partition Number: 2
+Header Dump
+Image Word Len: 0x00038428
+Data Word Len: 0x00038428
+Partition Word Len:0x00038428
+Load Addr: 0x04000000
+Exec Addr: 0x04000000
+Partition Start: 0x00334700
+Partition Attr: 0x00000011
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xF7C22A15
+Application
+Partition Number: 3
+Header Dump
+Image Word Len: 0x00000A7D
+Data Word Len: 0x00000A7D
+Partition Word Len:0x00000A7D
+Load Addr: 0x01800000
+Exec Addr: 0x00000000
+Partition Start: 0x0036CB30
+Partition Attr: 0x00000012
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFE4912D5
+Application
+Partition Number: 4
+Header Dump
+Image Word Len: 0x001446EB
+Data Word Len: 0x001446EB
+Partition Word Len:0x001446EB
+Load Addr: 0x01000000
+Exec Addr: 0x00000000
+Partition Start: 0x0036D5B0
+Partition Attr: 0x00000012
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFE8C52FB
+Application
+Partition Number: 5
+Header Dump
+Image Word Len: 0x0010D118
+Data Word Len: 0x0010D118
+Partition Word Len:0x0010D118
+Load Addr: 0x01900000
+Exec Addr: 0x00000000
+Partition Start: 0x004B1CA0
+Partition Attr: 0x00000010
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFDF26D76
+Application
+Handoff Address: 0x04000000
+In FsblHookBeforeHandoff function 
+SUCCESSFUL_HANDOFF
+FSBL Status = 0x1
+
+
+U-Boot 2021.01 (Apr 25 2025 - 08:36:57 -0400)
+
+CPU:   Zynq 7z045
+Silicon: v3.1
+DRAM:  ECC disabled 1 GiB
+Flash: 0 Bytes
+NAND:  0 MiB
+MMC:   mmc@e0100000: 0
+Loading Environment from SPIFlash... SF: Detected n25q256a with page size 512 Bytes, erase size 8 KiB, total 64 MiB
+OK
+In:    serial@e0000000
+Out:   serial@e0000000
+Err:   serial@e0000000
+Net:   
+ZYNQ GEM: e000b000, mdio bus e000b000, phyaddr -1, interface rgmii-id
+
+Warning: ethernet@e000b000 (eth0) using random MAC address - c6:8f:37:f3:e6:4a
+eth0: ethernet@e000b000
+Hit any key to stop autoboot:  0 
+Zynq>  
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 指定从emmc启动rootfs<INTERRUPT>
+Zynq> setenv bootargs 'root=/dev/mmcblk0p2 rw'
+Zynq> load mmc 0 0x1000000 uramdisk.z7045.rcS.image.gz
+5838575 bytes read in 342 ms (16.3 MiB/s)
+Zynq> load mmc 0 0x1900000 uImage
+4409824 bytes read in 259 ms (16.2 MiB/s)
+Zynq> bootm 0x1900000 0x1000000 0x1800000
+## Booting kernel from Legacy Image at 01900000 ...
+   Image Name:   Linux-5.10.0-xilinx
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    4409760 Bytes = 4.2 MiB
+   Load Address: 00008000
+   Entry Point:  00008000
+   Verifying Checksum ... OK
+## Loading init Ramdisk from Legacy Image at 01000000 ...
+   Image Name:   
+   Image Type:   ARM Linux RAMDisk Image (gzip compressed)
+   Data Size:    5838511 Bytes = 5.6 MiB
+   Load Address: 00000000
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+## Flattened Device Tree blob at 01800000
+   Booting using the fdt blob at 0x1800000
+   Loading Kernel Image
+   Loading Ramdisk to 2fa6e000, end 2ffff6af ... OK
+   Loading Device Tree to 2fa68000, end 2fa6d9f1 ... OK
+
+Starting kernel ...
+
+Booting Linux on physical CPU 0x0
+Linux version 5.10.0-xilinx (whf@binpc-EMBED-6315) (arm-linux-gnueabihf-gcc (Linaro GCC 7.3-2018.04-rc3) 7.3.1 20180314, GNU ld (Linaro_Binutils-) 2.29.1.20171214) #15 SMP PREEMPT Wed Aug 27 05:10:10 EDT 2025
+CPU: ARMv7 Processor [413fc090] revision 0 (ARMv7), cr=18c5387d
+CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+OF: fdt: Machine model: xlnx,zynq-7000
+Memory policy: Data cache writealloc
+cma: Reserved 16 MiB at 0x3f000000
+Zone ranges:
+  Normal   [mem 0x0000000000000000-0x000000002fffffff]
+  HighMem  [mem 0x0000000030000000-0x000000003fffffff]
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000000000000-0x000000003fffffff]
+Initmem setup node 0 [mem 0x0000000000000000-0x000000003fffffff]
+percpu: Embedded 15 pages/cpu s31436 r8192 d21812 u61440
+Built 1 zonelists, mobility grouping on.  Total pages: 260608
+Kernel command line: root=/dev/mmcblk0p2 rw
+Dentry cache hash table entries: 131072 (order: 7, 524288 bytes, linear)
+Inode-cache hash table entries: 65536 (order: 6, 262144 bytes, linear)
+mem auto-init: stack:off, heap alloc:off, heap free:off
+Memory: 1007192K/1048576K available (6144K kernel code, 245K rwdata, 1808K rodata, 1024K init, 167K bss, 25000K reserved, 16384K cma-reserved, 245760K highmem)
+rcu: Preemptible hierarchical RCU implementation.
+rcu:    RCU event tracing is enabled.
+rcu:    RCU restricting CPUs from NR_CPUS=4 to nr_cpu_ids=2.
+        Trampoline variant of Tasks RCU enabled.
+rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+efuse mapped to (ptrval)
+slcr mapped to (ptrval)
+L2C: platform modifies aux control register: 0x72360000 -> 0x72760000
+L2C: DT/platform modifies aux control register: 0x72360000 -> 0x72760000
+L2C-310 erratum 769419 enabled
+L2C-310 enabling early BRESP for Cortex-A9
+L2C-310 full line of zeros enabled for Cortex-A9
+L2C-310 ID prefetch enabled, offset 1 lines
+L2C-310 dynamic clock gating enabled, standby mode enabled
+L2C-310 cache controller enabled, 8 ways, 512 kB
+L2C-310: CACHE_ID 0x410000c8, AUX_CTRL 0x76760001
+random: get_random_bytes called from start_kernel+0x2c0/0x484 with crng_init=0
+zynq_clock_init: clkc starts at (ptrval)
+Zynq clock init
+sched_clock: 64 bits at 333MHz, resolution 3ns, wraps every 4398046511103ns
+clocksource: arm_global_timer: mask: 0xffffffffffffffff max_cycles: 0x4ce07af025, max_idle_ns: 440795209040 ns
+Switching to timer-based delay loop, resolution 3ns
+Console: colour dummy device 80x30
+printk: console [tty0] enabled
+Calibrating delay loop (skipped), value calculated using timer frequency.. 666.66 BogoMIPS (lpj=3333333)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 2048 (order: 1, 8192 bytes, linear)
+Mountpoint-cache hash table entries: 2048 (order: 1, 8192 bytes, linear)
+CPU: Testing write buffer coherency: ok
+CPU0: Spectre v2: using BPIALL workaround
+CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+Setting up static identity map for 0x100000 - 0x10003c
+rcu: Hierarchical SRCU implementation.
+smp: Bringing up secondary CPUs ...
+CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+CPU1: Spectre v2: using BPIALL workaround
+smp: Brought up 1 node, 2 CPUs
+SMP: Total of 2 processors activated (1333.33 BogoMIPS).
+CPU: All CPU(s) started in SVC mode.
+z7045:init/main.c:kernel_init_freeable():1530:call do_basic_setup
+devtmpfs: initialized
+VFP support v0.3: implementor 41 architecture 3 part 30 variant 9 rev 4
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+futex hash table entries: 512 (order: 3, 32768 bytes, linear)
+pinctrl core: initialized pinctrl subsystem
+NET: Registered protocol family 16
+DMA: preallocated 256 KiB pool for atomic coherent allocations
+thermal_sys: Registered thermal governor 'step_wise'
+cpuidle: using governor menu
+hw-breakpoint: found 5 (+1 reserved) breakpoint and 1 watchpoint registers.
+hw-breakpoint: maximum watchpoint size is 4 bytes.
+zynq-ocm f800c000.ocmc: ZYNQ OCM pool: 256 KiB @ 0x(ptrval)
+e0000000.serial: ttyPS0 at MMIO 0xe0000000 (irq = 32, base_baud = 6249999) is a xuartps
+printk: console [ttyPS0] enabled
+vgaarb: loaded
+SCSI subsystem initialized
+usbcore: registered new interface driver usbfs
+usbcore: registered new interface driver hub
+usbcore: registered new device driver usb
+mc: Linux media interface: v0.10
+videodev: Linux video capture interface: v2.00
+pps_core: LinuxPPS API ver. 1 registered
+pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+PTP clock support registered
+EDAC MC: Ver: 3.0.0
+FPGA manager framework
+Advanced Linux Sound Architecture Driver Initialized.
+clocksource: Switched to clocksource arm_global_timer
+NET: Registered protocol family 2
+tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 6144 bytes, linear)
+TCP established hash table entries: 8192 (order: 3, 32768 bytes, linear)
+TCP bind hash table entries: 8192 (order: 4, 65536 bytes, linear)
+TCP: Hash tables configured (established 8192 bind 8192)
+UDP hash table entries: 512 (order: 2, 16384 bytes, linear)
+UDP-Lite hash table entries: 512 (order: 2, 16384 bytes, linear)
+NET: Registered protocol family 1
+RPC: Registered named UNIX socket transport module.
+RPC: Registered udp transport module.
+RPC: Registered tcp transport module.
+RPC: Registered tcp NFSv4.1 backchannel transport module.
+PCI: CLS 0 bytes, default 64
+Trying to unpack rootfs image as initramfs...
+rootfs image is not initramfs (no cpio magic); looks like an initrd
+Freeing initrd memory: 5704K
+hw perfevents: no interrupt-affinity property for /pmu@f8891000, guessing.
+hw perfevents: enabled with armv7_cortex_a9 PMU driver, 7 counters available
+workingset: timestamp_bits=30 max_order=18 bucket_order=0
+jffs2: version 2.2. (NAND) (SUMMARY)  漏 2001-2006 Red Hat, Inc.
+bounce: pool size: 64 pages
+io scheduler mq-deadline registered
+io scheduler kyber registered
+zynq-pinctrl 700.pinctrl: zynq pinctrl initialized
+dma-pl330 f8003000.dmac: Loaded driver for PL330 DMAC-241330
+dma-pl330 f8003000.dmac:        DBUFF-128x8bytes Num_Chans-8 Num_Peri-4 Num_Events-16
+42c00000.serial: ttyUL1 at MMIO 0x42c00000 (irq = 56, base_baud = 0) is a uartlite
+brd: module loaded
+loop: module loaded
+drivers/spi/spi-cadence.c:cdns_spi_probe():511:res->start=0xe0006000, end=0xe0006fff,res->name=spi@e0006000
+drivers/spi/spi-cadence.c:cdns_spi_probe():522:pclk->rate=111111110
+drivers/spi/spi-cadence.c:cdns_spi_probe():532:ref_clk->rate=15873016
+drivers/spi/spi-cadence.c:cdns_spi_probe():559:cs=3
+drivers/spi/spi-cadence.c:cdns_spi_probe():572:is_decoded_cs=0
+drivers/spi/spi-cadence.c:cdns_spi_probe():511:res->start=0xe0007000, end=0xe0007fff,res->name=spi@e0007000
+drivers/spi/spi-cadence.c:cdns_spi_probe():522:pclk->rate=111111110
+drivers/spi/spi-cadence.c:cdns_spi_probe():532:ref_clk->rate=15873016
+drivers/spi/spi-cadence.c:cdns_spi_probe():559:cs=3
+drivers/spi/spi-cadence.c:cdns_spi_probe():572:is_decoded_cs=0
+libphy: Fixed MDIO Bus: probed
+CAN device driver interface
+libphy: MACB_mii_bus: probed
+macb e000b000.ethernet eth0: Cadence GEM rev 0x00020118 at 0xe000b000 irq 36 (c6:8f:37:f3:e6:4a)
+macb e000c000.ethernet: invalid hw address, using random
+libphy: MACB_mii_bus: probed
+macb e000c000.ethernet eth1: Cadence GEM rev 0x00020118 at 0xe000c000 irq 37 (d6:cd:a4:1a:ff:f7)
+e1000e: Intel(R) PRO/1000 Network Driver
+e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+ehci-pci: EHCI PCI platform driver
+usbcore: registered new interface driver usb-storage
+i2c /dev entries driver
+cdns-wdt f8005000.watchdog: Xilinx Watchdog Timer with timeout 10s
+EDAC MC: ECC not enabled
+Xilinx Zynq CpuIdle Driver started
+sdhci: Secure Digital Host Controller Interface driver
+sdhci: Copyright(c) Pierre Ossman
+sdhci-pltfm: SDHCI platform and OF driver helper
+ledtrig-cpu: registered to indicate activity on CPUs
+clocksource: ttc_clocksource: mask: 0xffff max_cycles: 0xffff, max_idle_ns: 537538477 ns
+timer #0 at (ptrval), irq=50
+usbcore: registered new interface driver usbhid
+usbhid: USB HID core driver
+fpga_manager fpga0: Xilinx Zynq FPGA Manager registered
+NET: Registered protocol family 10
+mmc0: SDHCI controller on e0100000.mmc [e0100000.mmc] using ADMA
+Segment Routing with IPv6
+sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+NET: Registered protocol family 17
+can: controller area network core
+NET: Registered protocol family 29
+can: raw protocol
+can: broadcast manager protocol
+can: netlink gateway - max_hops=1
+Registering SWP/SWPB emulation handler
+of-fpga-region fpga-full: FPGA Region probed
+of_cfs_init
+of_cfs_init: OK
+ALSA device list:
+  No soundcards found.
+z7045:init/main.c:kernel_init_freeable():1541:ramdisk_execute_command=/init
+z7045:init/main.c:kernel_init_freeable():1545:call prepare_namespace
+z7045:init/do_mounts.c:prepare_namespace():724:start rootfs from emmc
+z7045:Waiting for root device /dev/mmcblk0p2...
+mmc0: new high speed MMC card at address 0001
+mmcblk0: mmc0:0001 TCY2D2 58.2 GiB 
+mmcblk0boot0: mmc0:0001 TCY2D2 partition 1 4.00 MiB
+mmcblk0boot1: mmc0:0001 TCY2D2 partition 2 4.00 MiB
+mmcblk0rpmb: mmc0:0001 TCY2D2 partition 3 4.00 MiB, chardev (245:0)
+ mmcblk0: p1 p2
+z7045:init/do_mounts.c:prepare_namespace():746:saved_root_name=/dev/mmcblk0p2, ROOT_DEV=0xb300002, fixed_devno=0xb300002
+z7045:init/do_mounts.c:prepare_namespace():747:saved_root_name=/dev/mmcblk0p2
+z7045:init/do_mounts.c:mount_root():578:create_dev(/dev/root) for emmc
+z7045:init/do_mounts.c:mount_root():579:root_mountflags=0x8000
+EXT4-fs (mmcblk0p2): mounting ext2 file system using the ext4 subsystem
+EXT4-fs (mmcblk0p2): warning: mounting unchecked fs, running e2fsck is recommended
+EXT4-fs (mmcblk0p2): mounted filesystem without journal. Opts: (null)
+VFS: Mounted root (ext2 filesystem) on device 179:2.
+devtmpfs: mounted
+Freeing unused kernel memory: 1024K
+z7045:init/main.c:kernel_init():1436:ramdisk_execute_command=(null)
+z7045:init/main.c:kernel_init():1437:execute_command=(null)
+z7045:init/main.c:kernel_init():1438:CONFIG_DEFAULT_INIT=
+Run /sbin/init as init process
+random: fast init done
+z7045-emmc:Starting rcS...
+mount: mounting none on /dev failed: Device or resource busy
+++ Mounting filesystem
+++ Setting up mdev
+/etc/init.d/rcS: line 20: can't create /proc/sys/kernel/hotplug: nonexistent directory
+++ Set ip addr
+macb e000b000.ethernet eth0: PHY [e000b000.ethernet-ffffffff:01] driver [Generic PHY] (irq=POLL)
+macb e000b000.ethernet eth0: configuring for phy/rgmii-id link mode
+macb e000c000.ethernet eth1: PHY [e000b000.ethernet-ffffffff:03] driver [Generic PHY] (irq=POLL)
+macb e000c000.ethernet eth1: configuring for phy/rgmii-id link mode
+++ Starting telnet daemon
+++ Starting http daemon
+++ Starting ftp daemon
+++ Starting ssh daemon
+random: sshd: uninitialized urandom read (32 bytes read)
+++mount emmc(/dev/mmcblk0p1) to /emmc 
+FAT-fs (mmcblk0p1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+++ Running user script init.sh from emmc Card
+++ init gpio
+z7045-emmc: rcS Complete
+zynq> macb e000b000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
+IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> cat pmacb e000c000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+IPv6: ADDRCONF(NETDEV_CHANGE): eth1: link becomes ready
+
+zynq> 
+zynq> 
+zynq> cat /proc/mounts 
+/dev/root / ext2 rw,relatime 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=503596k,nr_inodes=125899,mode=755 0 0
+none /proc proc rw,relatime 0 0
+none /sys sysfs rw,relatime 0 0
+none /tmp tmpfs rw,relatime 0 0
+/dev/mmcblk0p1 /emmc vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+zynq> 
+zynq> 
+zynq> 
+zynq> stat -f /
+  File: "/"
+    ID: 6143a1ee5fe4fc09 Namelen: 255     Type: ext2/ext3
+Block size: 4096      
+Blocks: Total: 13105441   Free: 13101770   Available: 12436035
+Inodes: Total: 3334144    Free: 3333372
+zynq>  
+zynq> 
+zynq> 
+zynq> 
+zynq> cat hello.txt 
+this is rootfs in emmc
+zynq> 
+zynq> 
+zynq> 
+zynq> df -h
+Filesystem                Size      Used Available Use% Mounted on
+devpts                  491.8M         0    491.8M   0% /dev/pts
+none                    491.8M         0    491.8M   0% /dev
+none                    491.8M         0    491.8M   0% /dev
+none                    491.8M         0    491.8M   0% /dev
+none                    491.8M         0    491.8M   0% /dev
+none                    503.1M         0    503.1M   0% /tmp
+/dev/mmcblk0p1            7.4G    554.8M      6.9G   7% /emmc
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> reboot
+zynq> umount: none busy - remounted read-only
+umount: none busy - remounted read-only
+umount: none busy - remounted read-only
+umount: none busy - remounted read-only
+umount: can't umount /dev/pts: Invalid argument
+The system is going down NOW!
+Sent SIGTERM to all processes
+Sent SIGKILL to all processes
+Requesting system reboot
+reboot: Restarting system
+
+Xilinx First Stage Boot Loader 
+Release 2020.2  Jun  9 2025-10:56:08
+Devcfg driver initialized 
+Silicon Version 3.1
+Boot mode is QSPI
+Single Flash Information
+FlashID=0x20 0xBA 0x19
+MICRON 256M Bits
+QSPI is in Dual Parallel connection
+QSPI Init Done 
+Flash Base Address: 0xFC000000
+Reboot status register: 0x60480000
+Multiboot Register: 0x0000C000
+Image Start Address: 0x00000000
+Partition Header Offset:0x00000C80
+Partition Count: 6
+Partition Number: 1
+Header Dump
+Image Word Len: 0x0032D130
+Data Word Len: 0x0032D130
+Partition Word Len:0x0032D130
+Load Addr: 0x00000000
+Exec Addr: 0x00000000
+Partition Start: 0x000075D0
+Partition Attr: 0x00000020
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFF67142E
+Bitstream
+In FsblHookBeforeBitstreamDload function 
+PCAP:StatusReg = 0x40000A30
+PCAP:device ready
+PCAP:Clear done
+Level Shifter Value = 0xA 
+Devcfg Status register = 0x40000A30 
+PCAP:Fabric is Initialized done
+PCAP register dump:
+PCAP CTRL 0xF8007000: 0x4C00E07F
+PCAP LOCK 0xF8007004: 0x0000001A
+PCAP CONFIG 0xF8007008: 0x00000508
+PCAP ISR 0xF800700C: 0x0802000B
+PCAP IMR 0xF8007010: 0xFFFFFFFF
+PCAP STATUS 0xF8007014: 0x00000A30
+PCAP DMA SRC ADDR 0xF8007018: 0x00100001
+PCAP DMA DEST ADDR 0xF800701C: 0xFFFFFFFF
+PCAP DMA SRC LEN 0xF8007020: 0x0032D130
+PCAP DMA DEST LEN 0xF8007024: 0x0032D130
+PCAP ROM SHADOW CTRL 0xF8007028: 0xFFFFFFFF
+PCAP MBOOT 0xF800702C: 0x0000C000
+PCAP SW ID 0xF8007030: 0x00000000
+PCAP UNLOCK 0xF8007034: 0x757BDF0D
+PCAP MCTRL 0xF8007080: 0x30800100
+...................................................................................................
+DMA Done ! 
+
+FPGA Done ! 
+In FsblHookAfterBitstreamDload function 
+Partition Number: 2
+Header Dump
+Image Word Len: 0x00038428
+Data Word Len: 0x00038428
+Partition Word Len:0x00038428
+Load Addr: 0x04000000
+Exec Addr: 0x04000000
+Partition Start: 0x00334700
+Partition Attr: 0x00000011
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xF7C22A15
+Application
+Partition Number: 3
+Header Dump
+Image Word Len: 0x00000A7D
+Data Word Len: 0x00000A7D
+Partition Word Len:0x00000A7D
+Load Addr: 0x01800000
+Exec Addr: 0x00000000
+Partition Start: 0x0036CB30
+Partition Attr: 0x00000012
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFE4912D5
+Application
+Partition Number: 4
+Header Dump
+Image Word Len: 0x001446EB
+Data Word Len: 0x001446EB
+Partition Word Len:0x001446EB
+Load Addr: 0x01000000
+Exec Addr: 0x00000000
+Partition Start: 0x0036D5B0
+Partition Attr: 0x00000012
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFE8C52FB
+Application
+Partition Number: 5
+Header Dump
+Image Word Len: 0x0010D118
+Data Word Len: 0x0010D118
+Partition Word Len:0x0010D118
+Load Addr: 0x01900000
+Exec Addr: 0x00000000
+Partition Start: 0x004B1CA0
+Partition Attr: 0x00000010
+Partition Checksum Offset: 0x00000000
+Section Count: 0x00000001
+Checksum: 0xFDF26D76
+Application
+Handoff Address: 0x04000000
+In FsblHookBeforeHandoff function 
+SUCCESSFUL_HANDOFF
+FSBL Status = 0x1
+
+
+U-Boot 2021.01 (Apr 25 2025 - 08:36:57 -0400)
+
+CPU:   Zynq 7z045
+Silicon: v3.1
+DRAM:  ECC disabled 1 GiB
+Flash: 0 Bytes
+NAND:  0 MiB
+MMC:   mmc@e0100000: 0
+Loading Environment from SPIFlash... SF: Detected n25q256a with page size 512 Bytes, erase size 8 KiB, total 64 MiB
+OK
+In:    serial@e0000000
+Out:   serial@e0000000
+Err:   serial@e0000000
+Net:   
+ZYNQ GEM: e000b000, mdio bus e000b000, phyaddr -1, interface rgmii-id
+
+Warning: ethernet@e000b000 (eth0) using random MAC address - 6e:5c:9c:ed:33:bb
+eth0: ethernet@e000b000
+Hit any key to stop autoboot:  0 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 
+Zynq> 接下来不指定启动参数，不从emmc启动rootfs，那么会默认从ramdisk启动rootfs  <INTERRUPT>
+Zynq> <INTERRUPT>
+Zynq> <INTERRUPT>
+Zynq> load mmc 0 0x1000000 uramdisk.z7045.rcS.image.gz
+5838575 bytes read in 341 ms (16.3 MiB/s)
+Zynq> load mmc 0 0x1900000 uImage
+4409824 bytes read in 260 ms (16.2 MiB/s)
+Zynq> bootm 0x1900000 0x1000000 0x1800000
+## Booting kernel from Legacy Image at 01900000 ...
+   Image Name:   Linux-5.10.0-xilinx
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    4409760 Bytes = 4.2 MiB
+   Load Address: 00008000
+   Entry Point:  00008000
+   Verifying Checksum ... OK
+## Loading init Ramdisk from Legacy Image at 01000000 ...
+   Image Name:   
+   Image Type:   ARM Linux RAMDisk Image (gzip compressed)
+   Data Size:    5838511 Bytes = 5.6 MiB
+   Load Address: 00000000
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+## Flattened Device Tree blob at 01800000
+   Booting using the fdt blob at 0x1800000
+   Loading Kernel Image
+   Loading Ramdisk to 2fa6e000, end 2ffff6af ... OK
+   Loading Device Tree to 2fa68000, end 2fa6d9f1 ... OK
+
+Starting kernel ...
+
+Booting Linux on physical CPU 0x0
+Linux version 5.10.0-xilinx (whf@binpc-EMBED-6315) (arm-linux-gnueabihf-gcc (Linaro GCC 7.3-2018.04-rc3) 7.3.1 20180314, GNU ld (Linaro_Binutils-) 2.29.1.20171214) #15 SMP PREEMPT Wed Aug 27 05:10:10 EDT 2025
+CPU: ARMv7 Processor [413fc090] revision 0 (ARMv7), cr=18c5387d
+CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+OF: fdt: Machine model: xlnx,zynq-7000
+earlycon: cdns0 at MMIO 0xe0000000 (options '115200n8')
+printk: bootconsole [cdns0] enabled
+Memory policy: Data cache writealloc
+cma: Reserved 16 MiB at 0x3f000000
+Zone ranges:
+  Normal   [mem 0x0000000000000000-0x000000002fffffff]
+  HighMem  [mem 0x0000000030000000-0x000000003fffffff]
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000000000000-0x000000003fffffff]
+Initmem setup node 0 [mem 0x0000000000000000-0x000000003fffffff]
+percpu: Embedded 15 pages/cpu s31436 r8192 d21812 u61440
+Built 1 zonelists, mobility grouping on.  Total pages: 260608
+Kernel command line: console=ttyPS0,115200n8 earlyprintk rootwait earlycon
+Dentry cache hash table entries: 131072 (order: 7, 524288 bytes, linear)
+Inode-cache hash table entries: 65536 (order: 6, 262144 bytes, linear)
+mem auto-init: stack:off, heap alloc:off, heap free:off
+Memory: 1007188K/1048576K available (6144K kernel code, 245K rwdata, 1808K rodata, 1024K init, 167K bss, 25004K reserved, 16384K cma-reserved, 245760K highmem)
+rcu: Preemptible hierarchical RCU implementation.
+rcu:    RCU event tracing is enabled.
+rcu:    RCU restricting CPUs from NR_CPUS=4 to nr_cpu_ids=2.
+        Trampoline variant of Tasks RCU enabled.
+rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+efuse mapped to (ptrval)
+slcr mapped to (ptrval)
+L2C: platform modifies aux control register: 0x72360000 -> 0x72760000
+L2C: DT/platform modifies aux control register: 0x72360000 -> 0x72760000
+L2C-310 erratum 769419 enabled
+L2C-310 enabling early BRESP for Cortex-A9
+L2C-310 full line of zeros enabled for Cortex-A9
+L2C-310 ID prefetch enabled, offset 1 lines
+L2C-310 dynamic clock gating enabled, standby mode enabled
+L2C-310 cache controller enabled, 8 ways, 512 kB
+L2C-310: CACHE_ID 0x410000c8, AUX_CTRL 0x76760001
+random: get_random_bytes called from start_kernel+0x2c0/0x484 with crng_init=0
+zynq_clock_init: clkc starts at (ptrval)
+Zynq clock init
+sched_clock: 64 bits at 333MHz, resolution 3ns, wraps every 4398046511103ns
+clocksource: arm_global_timer: mask: 0xffffffffffffffff max_cycles: 0x4ce07af025, max_idle_ns: 440795209040 ns
+Switching to timer-based delay loop, resolution 3ns
+Console: colour dummy device 80x30
+Calibrating delay loop (skipped), value calculated using timer frequency.. 666.66 BogoMIPS (lpj=3333333)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 2048 (order: 1, 8192 bytes, linear)
+Mountpoint-cache hash table entries: 2048 (order: 1, 8192 bytes, linear)
+CPU: Testing write buffer coherency: ok
+CPU0: Spectre v2: using BPIALL workaround
+CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+Setting up static identity map for 0x100000 - 0x10003c
+rcu: Hierarchical SRCU implementation.
+smp: Bringing up secondary CPUs ...
+CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+CPU1: Spectre v2: using BPIALL workaround
+smp: Brought up 1 node, 2 CPUs
+SMP: Total of 2 processors activated (1333.33 BogoMIPS).
+CPU: All CPU(s) started in SVC mode.
+z7045:init/main.c:kernel_init_freeable():1530:call do_basic_setup
+devtmpfs: initialized
+VFP support v0.3: implementor 41 architecture 3 part 30 variant 9 rev 4
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+futex hash table entries: 512 (order: 3, 32768 bytes, linear)
+pinctrl core: initialized pinctrl subsystem
+NET: Registered protocol family 16
+DMA: preallocated 256 KiB pool for atomic coherent allocations
+thermal_sys: Registered thermal governor 'step_wise'
+cpuidle: using governor menu
+hw-breakpoint: found 5 (+1 reserved) breakpoint and 1 watchpoint registers.
+hw-breakpoint: maximum watchpoint size is 4 bytes.
+zynq-ocm f800c000.ocmc: ZYNQ OCM pool: 256 KiB @ 0x(ptrval)
+e0000000.serial: ttyPS0 at MMIO 0xe0000000 (irq = 32, base_baud = 6249999) is a xuartps
+printk: console [ttyPS0] enabled
+printk: console [ttyPS0] enabled
+printk: bootconsole [cdns0] disabled
+printk: bootconsole [cdns0] disabled
+vgaarb: loaded
+SCSI subsystem initialized
+usbcore: registered new interface driver usbfs
+usbcore: registered new interface driver hub
+usbcore: registered new device driver usb
+mc: Linux media interface: v0.10
+videodev: Linux video capture interface: v2.00
+pps_core: LinuxPPS API ver. 1 registered
+pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+PTP clock support registered
+EDAC MC: Ver: 3.0.0
+FPGA manager framework
+Advanced Linux Sound Architecture Driver Initialized.
+clocksource: Switched to clocksource arm_global_timer
+NET: Registered protocol family 2
+tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 6144 bytes, linear)
+TCP established hash table entries: 8192 (order: 3, 32768 bytes, linear)
+TCP bind hash table entries: 8192 (order: 4, 65536 bytes, linear)
+TCP: Hash tables configured (established 8192 bind 8192)
+UDP hash table entries: 512 (order: 2, 16384 bytes, linear)
+UDP-Lite hash table entries: 512 (order: 2, 16384 bytes, linear)
+NET: Registered protocol family 1
+RPC: Registered named UNIX socket transport module.
+RPC: Registered udp transport module.
+RPC: Registered tcp transport module.
+RPC: Registered tcp NFSv4.1 backchannel transport module.
+PCI: CLS 0 bytes, default 64
+Trying to unpack rootfs image as initramfs...
+rootfs image is not initramfs (no cpio magic); looks like an initrd
+Freeing initrd memory: 5704K
+hw perfevents: no interrupt-affinity property for /pmu@f8891000, guessing.
+hw perfevents: enabled with armv7_cortex_a9 PMU driver, 7 counters available
+workingset: timestamp_bits=30 max_order=18 bucket_order=0
+jffs2: version 2.2. (NAND) (SUMMARY)  漏 2001-2006 Red Hat, Inc.
+bounce: pool size: 64 pages
+io scheduler mq-deadline registered
+io scheduler kyber registered
+zynq-pinctrl 700.pinctrl: zynq pinctrl initialized
+dma-pl330 f8003000.dmac: Loaded driver for PL330 DMAC-241330
+dma-pl330 f8003000.dmac:        DBUFF-128x8bytes Num_Chans-8 Num_Peri-4 Num_Events-16
+42c00000.serial: ttyUL1 at MMIO 0x42c00000 (irq = 56, base_baud = 0) is a uartlite
+brd: module loaded
+loop: module loaded
+drivers/spi/spi-cadence.c:cdns_spi_probe():511:res->start=0xe0006000, end=0xe0006fff,res->name=spi@e0006000
+drivers/spi/spi-cadence.c:cdns_spi_probe():522:pclk->rate=111111110
+drivers/spi/spi-cadence.c:cdns_spi_probe():532:ref_clk->rate=15873016
+drivers/spi/spi-cadence.c:cdns_spi_probe():559:cs=3
+drivers/spi/spi-cadence.c:cdns_spi_probe():572:is_decoded_cs=0
+drivers/spi/spi-cadence.c:cdns_spi_probe():511:res->start=0xe0007000, end=0xe0007fff,res->name=spi@e0007000
+drivers/spi/spi-cadence.c:cdns_spi_probe():522:pclk->rate=111111110
+drivers/spi/spi-cadence.c:cdns_spi_probe():532:ref_clk->rate=15873016
+drivers/spi/spi-cadence.c:cdns_spi_probe():559:cs=3
+drivers/spi/spi-cadence.c:cdns_spi_probe():572:is_decoded_cs=0
+libphy: Fixed MDIO Bus: probed
+CAN device driver interface
+libphy: MACB_mii_bus: probed
+macb e000b000.ethernet eth0: Cadence GEM rev 0x00020118 at 0xe000b000 irq 36 (6e:5c:9c:ed:33:bb)
+macb e000c000.ethernet: invalid hw address, using random
+libphy: MACB_mii_bus: probed
+macb e000c000.ethernet eth1: Cadence GEM rev 0x00020118 at 0xe000c000 irq 37 (3a:88:56:86:94:03)
+e1000e: Intel(R) PRO/1000 Network Driver
+e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+ehci-pci: EHCI PCI platform driver
+usbcore: registered new interface driver usb-storage
+i2c /dev entries driver
+cdns-wdt f8005000.watchdog: Xilinx Watchdog Timer with timeout 10s
+EDAC MC: ECC not enabled
+Xilinx Zynq CpuIdle Driver started
+sdhci: Secure Digital Host Controller Interface driver
+sdhci: Copyright(c) Pierre Ossman
+sdhci-pltfm: SDHCI platform and OF driver helper
+ledtrig-cpu: registered to indicate activity on CPUs
+clocksource: ttc_clocksource: mask: 0xffff max_cycles: 0xffff, max_idle_ns: 537538477 ns
+timer #0 at (ptrval), irq=50
+usbcore: registered new interface driver usbhid
+usbhid: USB HID core driver
+fpga_manager fpga0: Xilinx Zynq FPGA Manager registered
+mmc0: SDHCI controller on e0100000.mmc [e0100000.mmc] using ADMA
+NET: Registered protocol family 10
+Segment Routing with IPv6
+sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+NET: Registered protocol family 17
+can: controller area network core
+NET: Registered protocol family 29
+can: raw protocol
+can: broadcast manager protocol
+can: netlink gateway - max_hops=1
+Registering SWP/SWPB emulation handler
+of-fpga-region fpga-full: FPGA Region probed
+of_cfs_init
+of_cfs_init: OK
+ALSA device list:
+  No soundcards found.
+z7045:init/main.c:kernel_init_freeable():1541:ramdisk_execute_command=/init
+z7045:init/main.c:kernel_init_freeable():1545:call prepare_namespace
+z7045:init/do_mounts.c:prepare_namespace():714:start rootfs from ramdisk
+RAMDISK: gzip image found at block 0
+mmc0: new high speed MMC card at address 0001
+mmcblk0: mmc0:0001 TCY2D2 58.2 GiB 
+mmcblk0boot0: mmc0:0001 TCY2D2 partition 1 4.00 MiB
+mmcblk0boot1: mmc0:0001 TCY2D2 partition 2 4.00 MiB
+mmcblk0rpmb: mmc0:0001 TCY2D2 partition 3 4.00 MiB, chardev (245:0)
+ mmcblk0: p1 p2
+using deprecated initrd support, will be removed in 2021.
+EXT4-fs (ram0): mounting ext2 file system using the ext4 subsystem
+EXT4-fs (ram0): warning: maximal mount count reached, running e2fsck is recommended
+EXT4-fs (ram0): mounted filesystem without journal. Opts: (null)
+VFS: Mounted root (ext2 filesystem) on device 1:0.
+z7045-ramdisk:Starting rcS...
+++ Mounting filesystem
+++ Setting up mdev
+/etc/init.d/rcS: line 14: can't create /proc/sys/kernel/hotplug: nonexistent directory
+++ Set ip addr
+macb e000b000.ethernet eth0: PHY [e000b000.ethernet-ffffffff:01] driver [Generic PHY] (irq=POLL)
+macb e000b000.ethernet eth0: configuring for phy/rgmii-id link mode
+macb e000c000.ethernet eth1: PHY [e000b000.ethernet-ffffffff:03] driver [Generic PHY] (irq=POLL)
+macb e000c000.ethernet eth1: configuring for phy/rgmii-id link mode
+++ Starting telnet daemon
+++ Starting http daemon
+++ Starting ftp daemon
+++ Starting ssh daemon
+random: sshd: uninitialized urandom read (32 bytes read)
+++mount emmc(/dev/mmcblk0p1) to /emmc 
+FAT-fs (mmcblk0p1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+++ Running user script init.sh from emmc Card
+++ init gpio
+z7045-ramdisk: rcS Complete
+zynq> macb e000c000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+IPv6: ADDRCONF(NETDEV_CHANGE): eth1: link becomes ready
+macb e000b000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
+IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+macb e000c000.ethernet eth1: Link is Down
+
+zynq> 
+zynq> 
+zynq> macb e000c000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+ls
+README          home            linuxrc         proc            update_qspi.sh
+bin             init            linuxrc.bak     root            usr
+dev             init.bak        lost+found      sbin            var
+emmc            lib             mnt             sys
+etc             licenses        opt             tmp
+zynq> df macb e000c000.ethernet eth1: Link is Down
+-h
+Filesystem                Size      Used Available Use% Mounted on
+none                    502.6M         0    502.6M   0% /tmp
+random: fast init done
+/dev/mmcblk0p1            7.4G    554.8M      6.9G   7% /emmc
+zynq> macb e000c000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+
+zynq> 
+zynq> macb e000c000.ethernet eth1: Link is Down
+macb e000c000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> cat /proc/mounts 
+/dev/root.old / ext2 rw,relatime,errors=remount-ro 0 0
+devpts /dev/pts devpts rw,relatime,gid=5,mode=620,ptmxmode=000 0 0
+none /proc proc rw,relatime 0 0
+none /sys sysfs rw,relatime 0 0
+none /tmp tmpfs rw,relatime 0 0
+/dev/mmcblk0p1 /emmc vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+zynq> 
+zynq> 
+zynq> 
+zynq> stat -f /
+  File: "/"
+    ID: 0        Namelen: 255     Type: ext2/ext3
+Block size: 1024      
+Blocks: Total: 16245      Free: 4126       Available: 3307
+Inodes: Total: 1040       Free: 274
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> df -h
+Filesystem                Size      Used Available Use% Mounted on
+none                    502.6M         0    502.6M   0% /tmp
+/dev/mmcblk0p1            7.4G    554.8M      6.9G   7% /emmc
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> 
+zynq> ls -sh
+     1 README             1 lib                1 root
+     2 bin                1 licenses           1 sbin
+     2 dev                0 linuxrc            0 sys
+     4 emmc               0 linuxrc.bak        0 tmp
+     1 etc              824 lost+found         1 update_qspi.sh
+     1 home               1 mnt                1 usr
+     2 init               1 opt                1 var
+     2 init.bak           0 proc
+zynq>  
+zynq> 
+zynq> 
+zynq> 
+zynq> 
